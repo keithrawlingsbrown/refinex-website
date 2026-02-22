@@ -1,8 +1,7 @@
-'use client';
+import Link from 'next/link'
+import { getActiveSignal } from '@/lib/refinex-api'
 
-import Link from 'next/link';
-
-const SAMPLE_SIGNAL = {
+const FALLBACK_SIGNAL = {
   signal_id: 'rxs_1a2b3c',
   region: 'us-east-1',
   instance: 'c5.2xlarge',
@@ -10,10 +9,36 @@ const SAMPLE_SIGNAL = {
   regime: 'STABLE_DISCOUNT',
   spot_savings: '-68%',
   suppressed: false,
-  timestamp: new Date().toISOString(),
-};
+}
 
-export default function HeroSection() {
+function formatSignalRows(signal: Record<string, unknown>) {
+  return [
+    ['signal_id', signal.signal_id || signal.id || FALLBACK_SIGNAL.signal_id, '#94A3B8'],
+    ['region', signal.region || FALLBACK_SIGNAL.region, '#F8FAFC'],
+    ['instance', signal.instance_type || signal.instance || FALLBACK_SIGNAL.instance, '#F8FAFC'],
+    ['confidence', signal.confidence_label || signal.confidence || FALLBACK_SIGNAL.confidence, '#10B981'],
+    ['regime', signal.regime || signal.market_regime || FALLBACK_SIGNAL.regime, '#3B82F6'],
+    ['spot_savings', signal.savings_percent ? `-${signal.savings_percent}%` : FALLBACK_SIGNAL.spot_savings, '#10B981'],
+    ['suppressed', String(signal.suppressed ?? FALLBACK_SIGNAL.suppressed), '#F59E0B'],
+  ]
+}
+
+export default async function HeroSection() {
+  let signal: Record<string, unknown> = FALLBACK_SIGNAL
+  let isLive = false
+
+  try {
+    const data = await getActiveSignal()
+    if (data && (data.signal || data.id || data.signal_id)) {
+      signal = data.signal || data
+      isLive = true
+    }
+  } catch {
+    // Fallback to static
+  }
+
+  const rows = formatSignalRows(signal)
+
   return (
     <section className="relative pt-32 pb-24 px-6">
       <div className="max-w-6xl mx-auto">
@@ -23,7 +48,7 @@ export default function HeroSection() {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium mb-8"
               style={{ background: 'rgba(37,99,235,0.15)', border: '1px solid rgba(37,99,235,0.3)', color: '#3B82F6' }}>
               <span className="w-1.5 h-1.5 rounded-full bg-refinex-success inline-block" />
-              Advisory signals · Preview mode
+              {isLive ? 'Live signal · Production' : 'Advisory signals · Preview mode'}
             </div>
 
             <h1 className="text-5xl font-bold tracking-tight text-refinex-primary leading-tight mb-6">
@@ -39,17 +64,13 @@ export default function HeroSection() {
 
             <div className="flex flex-col sm:flex-row gap-4">
               <Link href="/pricing"
-                className="inline-flex items-center justify-center px-6 py-3 rounded-lg font-semibold text-white transition-all"
-                style={{ background: '#2563EB' }}
-                onMouseEnter={e => (e.currentTarget.style.background = '#1D4ED8')}
-                onMouseLeave={e => (e.currentTarget.style.background = '#2563EB')}>
+                className="inline-flex items-center justify-center px-6 py-3 rounded-lg font-semibold text-white transition-all hover:opacity-90"
+                style={{ background: '#2563EB' }}>
                 Get API access
               </Link>
               <Link href="/transparency"
-                className="inline-flex items-center justify-center px-6 py-3 rounded-lg font-semibold transition-all"
-                style={{ border: '1px solid rgba(255,255,255,0.12)', color: '#94A3B8' }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.24)'; e.currentTarget.style.color = '#F8FAFC'; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = '#94A3B8'; }}>
+                className="inline-flex items-center justify-center px-6 py-3 rounded-lg font-semibold transition-all text-refinex-secondary hover:text-refinex-primary"
+                style={{ border: '1px solid rgba(255,255,255,0.12)' }}>
                 View live signals →
               </Link>
             </div>
@@ -59,26 +80,23 @@ export default function HeroSection() {
           <div className="relative">
             <div className="rounded-xl p-6" style={{ background: '#0F172A', border: '1px solid rgba(255,255,255,0.08)' }}>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-mono text-refinex-muted">LIVE SIGNAL</span>
+                <span className="text-xs font-mono text-refinex-muted">
+                  {isLive ? 'LIVE SIGNAL' : 'SAMPLE SIGNAL'}
+                </span>
                 <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold"
-                  style={{ background: 'rgba(16,185,129,0.15)', color: '#10B981', border: '1px solid rgba(16,185,129,0.3)' }}>
-                  <span className="w-1.5 h-1.5 rounded-full bg-refinex-success inline-block animate-pulse" />
-                  LIVE
+                  style={isLive
+                    ? { background: 'rgba(16,185,129,0.15)', color: '#10B981', border: '1px solid rgba(16,185,129,0.3)' }
+                    : { background: 'rgba(71,85,105,0.2)', color: '#475569', border: '1px solid rgba(71,85,105,0.3)' }
+                  }>
+                  {isLive && <span className="w-1.5 h-1.5 rounded-full bg-refinex-success inline-block animate-pulse" />}
+                  {isLive ? 'LIVE' : 'SAMPLE'}
                 </span>
               </div>
               <div className="space-y-3 font-mono text-sm">
-                {[
-                  ['signal_id', SAMPLE_SIGNAL.signal_id, '#94A3B8'],
-                  ['region', SAMPLE_SIGNAL.region, '#F8FAFC'],
-                  ['instance', SAMPLE_SIGNAL.instance, '#F8FAFC'],
-                  ['confidence', SAMPLE_SIGNAL.confidence, '#10B981'],
-                  ['regime', SAMPLE_SIGNAL.regime, '#3B82F6'],
-                  ['spot_savings', SAMPLE_SIGNAL.spot_savings, '#10B981'],
-                  ['suppressed', 'false', '#F59E0B'],
-                ].map(([key, val, color]) => (
-                  <div key={key} className="flex justify-between items-center">
-                    <span className="text-refinex-muted">{key}</span>
-                    <span style={{ color }}>{val}</span>
+                {rows.map(([key, val, color]) => (
+                  <div key={key as string} className="flex justify-between items-center">
+                    <span className="text-refinex-muted">{key as string}</span>
+                    <span style={{ color: color as string }}>{val as string}</span>
                   </div>
                 ))}
               </div>
@@ -90,5 +108,5 @@ export default function HeroSection() {
         </div>
       </div>
     </section>
-  );
+  )
 }

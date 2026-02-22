@@ -16,30 +16,22 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://refinex.io'),
-  title: 'RefineX - Spot Instance Arbitrage Signals API',
-  description: 'API-only system that emits cloud spot price arbitrage signals. 60-90% cost savings for Kubernetes autoscalers, CI/CD systems, and batch schedulers.',
-  keywords: ['spot instances', 'AWS', 'GCP', 'Azure', 'cost optimization', 'kubernetes', 'autoscaling'],
+  title: 'RefineX — Spot instance intelligence for your autoscaler',
+  description: 'Confidence-scored AWS spot market signals with regime context. API-first advisory signals for FinOps teams, Kubernetes autoscalers, and CI/CD pipelines.',
+  keywords: ['spot instances', 'AWS', 'cost optimization', 'kubernetes', 'autoscaling', 'FinOps', 'spot market signals'],
   authors: [{ name: 'RefineX' }],
   icons: { icon: '/favicon.svg' },
   openGraph: {
-    title: 'RefineX - Spot Instance Arbitrage Signals API',
-    description: '60-90% cost savings on cloud compute with real-time spot arbitrage signals',
+    title: 'RefineX — Spot instance intelligence for your autoscaler',
+    description: 'Confidence-scored AWS spot market signals with regime context. API-first. Advisory-only. Built for FinOps teams who want data before decisions.',
     type: 'website',
+    siteName: 'RefineX',
     url: 'https://refinex.io',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'RefineX - Spot Arbitrage Signals',
-      },
-    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'RefineX - Spot Instance Arbitrage Signals API',
-    description: '60-90% cost savings on cloud compute',
-    images: ['/og-image.png'],
+    title: 'RefineX — Spot instance intelligence for your autoscaler',
+    description: 'Confidence-scored AWS spot market signals with regime context. API-first. Advisory-only.',
   },
   robots: {
     index: true,

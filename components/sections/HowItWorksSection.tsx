@@ -1,91 +1,72 @@
-'use client'
-import { motion } from 'framer-motion'
-import { Cloud, Database, Cpu, ArrowRight } from 'lucide-react'
-import Card from '@/components/ui/Card'
-
 const steps = [
   {
-    icon: Cloud,
+    number: '01',
     title: 'Cloud APIs',
-    description: 'AWS, GCP, Azure',
+    subtitle: 'AWS, GCP, Azure',
     detail: 'Public spot pricing data updated every 5 minutes',
   },
   {
-    icon: Database,
+    number: '02',
     title: 'Detection Engine',
-    description: 'RefineX Core',
+    subtitle: 'RefineX Core',
     detail: 'Finds arbitrage opportunities, scores confidence',
   },
   {
-    icon: Cpu,
+    number: '03',
     title: 'Your System',
-    description: 'Kubernetes, CI/CD',
+    subtitle: 'Kubernetes, CI/CD',
     detail: 'Consumes signals via simple REST API',
   },
 ]
 
 export default function HowItWorksSection() {
   return (
-    <section className="relative py-20 bg-refinex-navy-dark">
-      <div className="mx-auto max-w-7xl px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+    <section className="py-20 section-divider">
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-refinex-primary mb-4">
             How it works
           </h2>
-          <p className="text-lg text-refinex-gray-100 opacity-80 max-w-2xl mx-auto">
+          <p className="text-lg text-refinex-secondary max-w-2xl mx-auto">
             Simple three-step pipeline from cloud APIs to your infrastructure decisions.
           </p>
-        </motion.div>
+        </div>
 
-        <div className="grid md:grid-cols-3 gap-6 items-center">
+        <div className="grid md:grid-cols-3 gap-6">
           {steps.map((step, index) => (
-            <motion.div
-              key={step.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.2 }}
-              viewport={{ once: true }}
-              className="relative"
-            >
-              <Card hover className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-refinex-cyan/10 border border-refinex-cyan/30 mb-4">
-                  <step.icon className="w-8 h-8 text-refinex-cyan" />
+            <div key={step.title} className="relative">
+              <div className="rounded-xl p-8 text-center h-full"
+                style={{ background: '#0F172A', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-5"
+                  style={{ background: 'rgba(37,99,235,0.12)', border: '1px solid rgba(37,99,235,0.25)' }}>
+                  <span className="text-lg font-bold" style={{ color: '#3B82F6' }}>
+                    {step.number}
+                  </span>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-                <p className="text-refinex-cyan text-sm mb-2">{step.description}</p>
-                <p className="text-refinex-gray-100 opacity-70 text-sm">
-                  {step.detail}
-                </p>
-              </Card>
+                <h3 className="text-xl font-semibold text-refinex-primary mb-2">{step.title}</h3>
+                <p className="text-sm mb-2" style={{ color: '#2563EB' }}>{step.subtitle}</p>
+                <p className="text-sm text-refinex-muted">{step.detail}</p>
+              </div>
 
-              {/* Arrow between cards */}
+              {/* Arrow connector */}
               {index < steps.length - 1 && (
-                <div className="hidden md:block absolute top-1/2 -right-8 transform -translate-y-1/2 z-10">
-                  <ArrowRight className="w-12 h-12 text-refinex-cyan opacity-30" />
+                <div className="hidden md:flex absolute top-1/2 -right-5 -translate-y-1/2 z-10 text-refinex-muted">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
                 </div>
               )}
-            </motion.div>
+            </div>
           ))}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          viewport={{ once: true }}
-          className="mt-12 text-center"
-        >
-          <div className="inline-flex flex-col items-center gap-2 px-6 py-3 rounded-lg bg-refinex-navy-light border border-refinex-cyan/20">
-            <p className="text-sm text-refinex-gray-100 opacity-60">Updates every</p>
-            <p className="text-2xl font-bold gradient-text">5 minutes</p>
+        <div className="mt-12 text-center">
+          <div className="inline-flex flex-col items-center gap-1 px-6 py-3 rounded-lg"
+            style={{ background: '#0F172A', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <p className="text-xs text-refinex-muted">Updates every</p>
+            <p className="text-2xl font-bold text-refinex-primary">5 minutes</p>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   )

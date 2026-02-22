@@ -1,9 +1,4 @@
-'use client'
-import { motion } from 'framer-motion'
 import Link from 'next/link'
-import CodeBlock from '@/components/ui/CodeBlock'
-import Button from '@/components/ui/Button'
-import { BookOpen } from 'lucide-react'
 
 const quickstartCode = `# Get single best action for autoscaler
 curl -H "X-API-Key: sk_live_..." \\
@@ -28,51 +23,41 @@ curl -H "X-API-Key: sk_live_..." \\
 
 export default function QuickstartSection() {
   return (
-    <section className="relative py-20">
+    <section className="py-20 section-divider">
       <div className="mx-auto max-w-5xl px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-refinex-primary mb-4">
             Get started in minutes
           </h2>
-          <p className="text-lg text-refinex-gray-100 opacity-80">
+          <p className="text-lg text-refinex-secondary">
             One HTTP call. One decision. No complexity.
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          viewport={{ once: true }}
-        >
-          <CodeBlock code={quickstartCode} language="bash" />
-        </motion.div>
+        <div className="rounded-xl overflow-hidden"
+          style={{ background: '#0F172A', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="flex items-center gap-2 px-4 py-3"
+            style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <span className="w-3 h-3 rounded-full" style={{ background: '#EF4444' }} />
+            <span className="w-3 h-3 rounded-full" style={{ background: '#F59E0B' }} />
+            <span className="w-3 h-3 rounded-full" style={{ background: '#10B981' }} />
+            <span className="ml-2 text-xs text-refinex-muted font-mono">terminal</span>
+          </div>
+          <pre className="p-6 overflow-x-auto text-sm font-mono leading-relaxed text-refinex-secondary">
+            {quickstartCode}
+          </pre>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          viewport={{ once: true }}
-          className="mt-8 flex justify-center gap-4"
-        >
-          <Link href="/docs">
-            <Button variant="outline">
-              <BookOpen className="w-4 h-4 mr-2" />
-              Full Documentation
-            </Button>
+        <div className="mt-8 flex justify-center gap-4">
+          <Link href="/docs"
+            className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-sm font-semibold btn-outline-subtle">
+            Full Documentation
           </Link>
-          <Link href="/api-reference">
-            <Button variant="secondary">
-              API Reference
-            </Button>
+          <Link href="/api-reference"
+            className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-sm font-semibold btn-outline-subtle">
+            API Reference
           </Link>
-        </motion.div>
+        </div>
       </div>
     </section>
   )

@@ -21,4 +21,21 @@
   .section-divider {
     border-top: 1px solid rgba(255,255,255,0.06);
   }
+  .btn-blue {
+    background: #2563EB;
+    color: #FFFFFF;
+    transition: background 0.15s ease;
+  }
+  .btn-blue:hover {
+    background: #1D4ED8;
+  }
+  .btn-outline-subtle {
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #94A3B8;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+  .btn-outline-subtle:hover {
+    border-color: rgba(255,255,255,0.24);
+    color: #F8FAFC;
+  }
 }

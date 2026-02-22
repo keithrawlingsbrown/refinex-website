@@ -25,13 +25,11 @@ export default function Home() {
           </p>
           <div className="flex gap-4 justify-center">
             <Link href="/docs/quickstart"
-              className="inline-flex items-center justify-center px-6 py-3 rounded-lg font-semibold text-white transition-all"
-              style={{ background: '#2563EB' }}>
+              className="inline-flex items-center justify-center px-6 py-3 rounded-lg font-semibold btn-blue">
               Get Started
             </Link>
             <Link href="/api-reference"
-              className="inline-flex items-center justify-center px-6 py-3 rounded-lg font-semibold transition-all"
-              style={{ border: '1px solid rgba(255,255,255,0.12)', color: '#94A3B8' }}>
+              className="inline-flex items-center justify-center px-6 py-3 rounded-lg font-semibold btn-outline-subtle">
               View API Docs
             </Link>
           </div>
