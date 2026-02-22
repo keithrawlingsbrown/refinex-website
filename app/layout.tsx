@@ -20,6 +20,7 @@ export const metadata: Metadata = {
   description: 'API-only system that emits cloud spot price arbitrage signals. 60-90% cost savings for Kubernetes autoscalers, CI/CD systems, and batch schedulers.',
   keywords: ['spot instances', 'AWS', 'GCP', 'Azure', 'cost optimization', 'kubernetes', 'autoscaling'],
   authors: [{ name: 'RefineX' }],
+  icons: { icon: '/favicon.svg' },
   openGraph: {
     title: 'RefineX - Spot Instance Arbitrage Signals API',
     description: '60-90% cost savings on cloud compute with real-time spot arbitrage signals',

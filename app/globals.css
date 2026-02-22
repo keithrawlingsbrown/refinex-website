@@ -2,96 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --font-inter: 'Inter', sans-serif;
-  --font-jetbrains: 'JetBrains Mono', monospace;
-}
-
 @layer base {
-  html {
-    @apply scroll-smooth;
-  }
-  
+  * { @apply border-border; }
   body {
-    @apply bg-refinex-navy text-refinex-gray-100 antialiased;
-  }
-
-  ::selection {
-    @apply bg-refinex-cyan/30 text-refinex-cyan;
+    @apply bg-refinex-navy text-refinex-primary;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
 @layer utilities {
   .gradient-text {
-    @apply bg-gradient-signal bg-clip-text text-transparent;
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #F8FAFC 0%, #94A3B8 100%);
   }
-
-  .glass-card {
-    @apply bg-white/5 backdrop-blur-sm border border-white/10;
+  .card-border {
+    border: 1px solid rgba(255,255,255,0.06);
   }
-
-  .grid-background {
-    background-image: 
-      linear-gradient(90deg, rgba(79, 232, 255, 0.1) 1px, transparent 1px),
-      linear-gradient(180deg, rgba(79, 232, 255, 0.1) 1px, transparent 1px);
-    background-size: 50px 50px;
-    animation: grid-pulse 20s ease-in-out infinite;
+  .section-divider {
+    border-top: 1px solid rgba(255,255,255,0.06);
   }
-
-  .code-block {
-    @apply bg-refinex-navy-dark border border-refinex-cyan/20 rounded-lg p-6 overflow-x-auto;
-  }
-
-  .link-underline {
-    @apply relative;
-  }
-
-  .link-underline::after {
-    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-refinex-cyan transition-all duration-300;
-    content: '';
-  }
-
-  .link-underline:hover::after {
-    @apply w-full;
-  }
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-refinex-navy-dark;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-refinex-cyan/30 rounded-full;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-refinex-cyan/50;
-}
-
-/* Loading skeleton */
-@keyframes skeleton-loading {
-  0% {
-    background-position: -200px 0;
-  }
-  100% {
-    background-position: calc(200px + 100%) 0;
-  }
-}
-
-.skeleton {
-  background-color: rgba(79, 232, 255, 0.1);
-  background-image: linear-gradient(
-    90deg,
-    rgba(79, 232, 255, 0.1) 0px,
-    rgba(79, 232, 255, 0.2) 40px,
-    rgba(79, 232, 255, 0.1) 80px
-  );
-  background-size: 200px 100%;
-  animation: skeleton-loading 1.5s ease-in-out infinite;
 }

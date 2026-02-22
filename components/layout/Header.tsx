@@ -1,70 +1,91 @@
 'use client'
+
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { cn } from '@/lib/utils'
-import Button from '@/components/ui/Button'
-import Logo from '@/components/ui/Logo'
+import { useEffect, useState } from 'react'
 
 const navigation = [
   { name: 'Docs', href: '/docs' },
   { name: 'API Reference', href: '/api-reference' },
-  { name: 'Technical Specs', href: '/specs' },
   { name: 'Pricing', href: '/pricing' },
-  { name: 'Enterprise', href: '/enterprise' },
+  { name: 'Transparency', href: '/transparency' },
 ]
 
 export default function Header() {
   const pathname = usePathname()
+  const [status, setStatus] = useState<'ok' | 'degraded' | 'loading'>('loading')
+
+  useEffect(() => {
+    async function checkHealth() {
+      try {
+        const res = await fetch('/api/health')
+        if (res.ok) {
+          const data = await res.json()
+          setStatus(data.ok ? 'ok' : 'degraded')
+        } else {
+          setStatus('degraded')
+        }
+      } catch {
+        setStatus('degraded')
+      }
+    }
+    checkHealth()
+    const interval = setInterval(checkHealth, 60_000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const statusColor = status === 'ok' ? '#10B981' : status === 'degraded' ? '#F59E0B' : '#475569'
 
   return (
-    <header className="sticky top-0 z-50 border-b border-refinex-cyan/10 bg-refinex-navy/95 backdrop-blur-sm">
-      <nav className="mx-auto max-w-7xl px-6 py-4">
+    <header className="sticky top-0 z-50"
+      style={{ background: 'rgba(10,15,30,0.95)', borderBottom: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(12px)' }}>
+      <nav className="mx-auto max-w-6xl px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-            <Logo className="h-8 w-8" />
-            <span className="text-xl font-bold gradient-text">RefineX</span>
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <span className="text-lg font-bold text-refinex-primary">RefineX</span>
           </Link>
 
           {/* Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-6">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className={cn(
-                  'text-sm font-medium transition-colors relative link-underline',
-                  pathname === item.href
-                    ? 'text-refinex-cyan'
-                    : 'text-refinex-gray-100 hover:text-refinex-cyan'
-                )}
+                className="text-sm font-medium transition-colors"
+                style={{
+                  color: pathname === item.href ? '#F8FAFC' : '#475569',
+                }}
+                onMouseEnter={e => { if (pathname !== item.href) e.currentTarget.style.color = '#94A3B8' }}
+                onMouseLeave={e => { if (pathname !== item.href) e.currentTarget.style.color = '#475569' }}
               >
                 {item.name}
               </Link>
             ))}
           </div>
 
-          {/* CTA */}
-          <div className="hidden md:block">
-            <Link href="/enterprise">
-              <Button size="sm">Get API Key</Button>
+          {/* Right side: status + CTA */}
+          <div className="hidden md:flex items-center gap-4">
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-full text-xs"
+              style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
+              <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: statusColor }} />
+              <span style={{ color: '#475569' }}>
+                {status === 'ok' ? 'All systems operational' : status === 'degraded' ? 'Degraded' : '...'}
+              </span>
+            </div>
+            <Link href="/pricing"
+              className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all"
+              style={{ background: '#2563EB' }}
+              onMouseEnter={e => (e.currentTarget.style.background = '#1D4ED8')}
+              onMouseLeave={e => (e.currentTarget.style.background = '#2563EB')}>
+              Get API Key
             </Link>
           </div>
 
           {/* Mobile menu button */}
-          <button className="md:hidden p-2 text-refinex-cyan">
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
+          <button className="md:hidden p-2 text-refinex-muted">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
         </div>

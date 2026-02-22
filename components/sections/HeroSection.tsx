@@ -1,96 +1,94 @@
-'use client'
-import { motion } from 'framer-motion'
-import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
-import Button from '@/components/ui/Button'
-import GridBackground from '@/components/ui/GridBackground'
-import CodeBlock from '@/components/ui/CodeBlock'
+'use client';
 
-const exampleCode = `curl -H "X-API-Key: sk_live_..." \\
-  https://api.refinex.io/v1/signals/active\\?cloud=aws\\&region=us-east-1\\&instance_type=c7g.xlarge
+import Link from 'next/link';
 
-{
-  "action": "buy_spot",
-  "signal": {
-    "type": "spot_arbitrage",
-    "confidence": 0.94,
-    "expected_value": {
-      "savings_percent": 70.6,
-      "savings_usd_per_hour": 0.102
-    }
-  }
-}`
+const SAMPLE_SIGNAL = {
+  signal_id: 'rxs_1a2b3c',
+  region: 'us-east-1',
+  instance: 'c5.2xlarge',
+  confidence: 'HIGH',
+  regime: 'STABLE_DISCOUNT',
+  spot_savings: '-68%',
+  suppressed: false,
+  timestamp: new Date().toISOString(),
+};
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-[90vh] flex items-center overflow-hidden">
-      <GridBackground />
-      
-      <div className="relative mx-auto max-w-7xl px-6 py-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left Content */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-refinex-cyan/10 border border-refinex-cyan/20 text-sm text-refinex-cyan mb-6">
-              <div className="w-2 h-2 rounded-full bg-refinex-cyan animate-pulse-glow" />
-              <span>API-Only • No Credentials Required</span>
+    <section className="relative pt-32 pb-24 px-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          {/* Left — Copy */}
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium mb-8"
+              style={{ background: 'rgba(37,99,235,0.15)', border: '1px solid rgba(37,99,235,0.3)', color: '#3B82F6' }}>
+              <span className="w-1.5 h-1.5 rounded-full bg-refinex-success inline-block" />
+              Advisory signals · Preview mode
             </div>
-            
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Spot Instance{' '}
-              <span className="gradient-text">Arbitrage Signals</span>{' '}
-              for Autoscalers
+
+            <h1 className="text-5xl font-bold tracking-tight text-refinex-primary leading-tight mb-6">
+              Spot instance intelligence<br />
+              <span style={{ color: '#3B82F6' }}>for your autoscaler</span>
             </h1>
-            
-            <p className="text-xl text-refinex-gray-100 opacity-80 mb-8 leading-relaxed">
-              60-90% cost savings on cloud compute. Real-time signals updated every 5 minutes. 
-              Built for Kubernetes HPA, CI/CD systems, and batch schedulers.
+
+            <p className="text-lg text-refinex-secondary leading-relaxed mb-8 max-w-lg">
+              Confidence-scored AWS spot market signals with regime context.
+              API-first. Advisory-only. Built for FinOps teams who want
+              data before decisions.
             </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 mb-12">
-              <Link href="/enterprise">
-                <Button size="lg">
-                  Get API Key
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link href="/pricing"
+                className="inline-flex items-center justify-center px-6 py-3 rounded-lg font-semibold text-white transition-all"
+                style={{ background: '#2563EB' }}
+                onMouseEnter={e => (e.currentTarget.style.background = '#1D4ED8')}
+                onMouseLeave={e => (e.currentTarget.style.background = '#2563EB')}>
+                Get API access
               </Link>
-              <Link href="/docs">
-                <Button size="lg" variant="outline">
-                  View Documentation
-                </Button>
+              <Link href="/transparency"
+                className="inline-flex items-center justify-center px-6 py-3 rounded-lg font-semibold transition-all"
+                style={{ border: '1px solid rgba(255,255,255,0.12)', color: '#94A3B8' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.24)'; e.currentTarget.style.color = '#F8FAFC'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = '#94A3B8'; }}>
+                View live signals →
               </Link>
             </div>
+          </div>
 
-            {/* Trust Indicators */}
-            <div className="flex flex-wrap gap-6 text-sm text-refinex-gray-100 opacity-60">
-              <div className="flex items-center gap-2">
-                <div className="w-1 h-1 rounded-full bg-refinex-cyan" />
-                <span>Read-only API</span>
+          {/* Right — Signal Card */}
+          <div className="relative">
+            <div className="rounded-xl p-6" style={{ background: '#0F172A', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-mono text-refinex-muted">LIVE SIGNAL</span>
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold"
+                  style={{ background: 'rgba(16,185,129,0.15)', color: '#10B981', border: '1px solid rgba(16,185,129,0.3)' }}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-refinex-success inline-block animate-pulse" />
+                  LIVE
+                </span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-1 h-1 rounded-full bg-refinex-cyan" />
-                <span>No cloud credentials</span>
+              <div className="space-y-3 font-mono text-sm">
+                {[
+                  ['signal_id', SAMPLE_SIGNAL.signal_id, '#94A3B8'],
+                  ['region', SAMPLE_SIGNAL.region, '#F8FAFC'],
+                  ['instance', SAMPLE_SIGNAL.instance, '#F8FAFC'],
+                  ['confidence', SAMPLE_SIGNAL.confidence, '#10B981'],
+                  ['regime', SAMPLE_SIGNAL.regime, '#3B82F6'],
+                  ['spot_savings', SAMPLE_SIGNAL.spot_savings, '#10B981'],
+                  ['suppressed', 'false', '#F59E0B'],
+                ].map(([key, val, color]) => (
+                  <div key={key} className="flex justify-between items-center">
+                    <span className="text-refinex-muted">{key}</span>
+                    <span style={{ color }}>{val}</span>
+                  </div>
+                ))}
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-1 h-1 rounded-full bg-refinex-cyan" />
-                <span>5-minute updates</span>
+              <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                <p className="text-xs text-refinex-muted">Advisory only — your autoscaler decides</p>
               </div>
             </div>
-          </motion.div>
-
-          {/* Right Content - Code Example */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <CodeBlock code={exampleCode} language="bash" />
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
-  )
+  );
 }
