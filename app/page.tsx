@@ -1,3 +1,5 @@
+export const revalidate = 60
+
 import HeroSection from '@/components/sections/HeroSection'
 import IntegrationBar from '@/components/IntegrationBar'
 import FeaturesSection from '@/components/sections/FeaturesSection'
