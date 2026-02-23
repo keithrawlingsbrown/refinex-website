@@ -79,7 +79,7 @@ export default function Header() {
                 {status === 'ok' ? 'All systems operational' : status === 'degraded' ? 'Degraded' : '...'}
               </span>
             </div>
-            <Link href="/pricing"
+            <Link href="/portal"
               className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all"
               style={{ background: '#2563EB' }}
               onMouseEnter={e => (e.currentTarget.style.background = '#1D4ED8')}
@@ -126,7 +126,7 @@ export default function Header() {
                 </Link>
               ))}
               <div className="px-4 pt-3 mt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                <Link href="/pricing"
+                <Link href="/portal"
                   onClick={() => setIsOpen(false)}
                   className="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-semibold text-white"
                   style={{ background: '#2563EB' }}>
