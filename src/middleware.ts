@@ -81,7 +81,7 @@ export function middleware(request: NextRequest) {
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https:",
     "font-src 'self' data:",
-    "connect-src 'self'",
+    "connect-src 'self' https://refinex-api.onrender.com",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
