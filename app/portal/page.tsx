@@ -15,7 +15,7 @@ export default function PortalPage() {
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/v1/portal/signup`,
+        `https://refinex-api.onrender.com/v1/portal/signup`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

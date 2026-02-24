@@ -14,7 +14,7 @@ function VerifyContent() {
   useEffect(() => {
     if (!token) { setState('error'); return; }
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/portal/verify?token=${token}`)
+    fetch(`https://refinex-api.onrender.com/v1/portal/verify?token=${token}`)
       .then(r => r.json())
       .then(d => {
         if (d.detail) { setState('error'); return; }
