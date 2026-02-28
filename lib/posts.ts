@@ -8,9 +8,10 @@ export interface PostMeta {
   slug: string;
   title: string;
   date: string;
-  excerpt: string;
+  description: string;
   author?: string;
-  tags?: string[];
+  tags: string[];
+  readingTime: number;
   published?: boolean;
 }
 
@@ -24,6 +25,11 @@ function ensurePostsDir() {
   }
 }
 
+function calcReadingTime(content: string): number {
+  const words = content.trim().split(/\s+/).length;
+  return Math.max(1, Math.round(words / 200));
+}
+
 export function getAllPosts(): PostMeta[] {
   ensurePostsDir();
 
@@ -34,16 +40,17 @@ export function getAllPosts(): PostMeta[] {
       const slug = filename.replace(/\.mdx?$/, '');
       const filePath = path.join(POSTS_DIR, filename);
       const raw = fs.readFileSync(filePath, 'utf-8');
-      const { data } = matter(raw);
+      const { data, content } = matter(raw);
 
       return {
         slug,
         title: data.title ?? slug,
         date: data.date ? String(data.date) : '',
-        excerpt: data.excerpt ?? '',
+        description: data.description ?? data.excerpt ?? '',
         author: data.author ?? undefined,
         tags: Array.isArray(data.tags) ? data.tags : [],
-        published: data.published !== false, // default true unless explicitly false
+        readingTime: calcReadingTime(content),
+        published: data.published !== false,
       } as PostMeta;
     })
     .filter(p => p.published)
@@ -77,9 +84,10 @@ export function getPost(slug: string): Post | null {
     slug,
     title: data.title ?? slug,
     date: data.date ? String(data.date) : '',
-    excerpt: data.excerpt ?? '',
+    description: data.description ?? data.excerpt ?? '',
     author: data.author ?? undefined,
     tags: Array.isArray(data.tags) ? data.tags : [],
+    readingTime: calcReadingTime(content),
     published: true,
     content,
   };
