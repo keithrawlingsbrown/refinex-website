@@ -28,6 +28,23 @@ export async function getSignalHistory() {
   return apiFetch('/v1/signals?limit=20');
 }
 
+export async function getSuppressedSignals(): Promise<any[]> {
+  try {
+    const res = await fetch(
+      `${process.env.REFINEX_API_URL}/v1/signals?limit=20&suppressed=true`,
+      {
+        headers: { 'X-API-Key': process.env.REFINEX_API_KEY! },
+        next: { revalidate: 60 }
+      }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.signals || data || [];
+  } catch {
+    return [];
+  }
+}
+
 export async function getSystemHealth() {
   return apiFetch('/v1/trinity/health', true);
 }
