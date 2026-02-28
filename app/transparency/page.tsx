@@ -1,4 +1,4 @@
-import { getActiveSignal, getSystemHealth, getDashboardSnapshot, getSignalHistory, getSuppressedSignals } from '@/lib/refinex-api';
+import { getActiveSignal, getSystemHealth, getDashboardSnapshot, getPublicSignalHistory, getSuppressedSignals } from '@/lib/refinex-api';
 
 function ConfidenceBadge({ score }: { score: number }) {
   const level = score >= 0.75 ? 'HIGH' : score >= 0.5 ? 'MEDIUM' : 'WATCH';
@@ -30,7 +30,7 @@ export default async function TransparencyPage() {
     getActiveSignal(),
     getSystemHealth(),
     getDashboardSnapshot(),
-    getSignalHistory(),
+    getPublicSignalHistory(),
     getSuppressedSignals(),
   ]);
 
