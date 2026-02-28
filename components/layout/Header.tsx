@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import Logo from '@/components/ui/Logo'
 
 const navigation = [
   { name: 'Docs', href: '/docs' },
@@ -50,6 +51,7 @@ export default function Header() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <Logo className="w-7 h-7" />
             <span className="text-lg font-bold text-refinex-primary">RefineX</span>
           </Link>
 
