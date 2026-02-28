@@ -1,4 +1,4 @@
-import { getActiveSignal, getSystemHealth, getDashboardSnapshot, getPublicSignalHistory, getSuppressedSignals } from '@/lib/refinex-api';
+import { getActiveSignal, getSystemHealth, getDashboardSnapshot, getPublicSignalHistory } from '@/lib/refinex-api';
 
 function ConfidenceBadge({ score }: { score: number }) {
   const level = score >= 0.75 ? 'HIGH' : score >= 0.5 ? 'MEDIUM' : 'WATCH';
@@ -26,13 +26,17 @@ function StatusDot({ ok }: { ok: boolean }) {
 export const revalidate = 60;
 
 export default async function TransparencyPage() {
-  const [signal, health, dashboard, history, suppressed] = await Promise.all([
+  const [signal, health, dashboard, historyData] = await Promise.all([
     getActiveSignal(),
     getSystemHealth(),
     getDashboardSnapshot(),
     getPublicSignalHistory(),
-    getSuppressedSignals(),
   ]);
+
+  const history = historyData.signals;
+  const suppressionRate = historyData.suppression_rate;
+  const deliveredCount = historyData.delivered;
+  const suppressedCount = historyData.suppressed;
 
   const activeCount = dashboard?.product_metrics?.active_signals ?? '—';
   const signals24h = dashboard?.product_metrics?.signals_24h ?? '—';
@@ -58,12 +62,13 @@ export default async function TransparencyPage() {
         {/* System Status */}
         <div className="rounded-xl p-6 mb-8 card-border" style={{ background: '#0F172A' }}>
           <h2 className="text-sm font-semibold uppercase tracking-widest text-refinex-muted mb-4">System Status</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {[
               { label: 'API', value: 'Operational', ok: true },
               { label: 'Signal Engine', value: isHealthy ? 'Healthy' : 'Degraded', ok: isHealthy },
               { label: 'Active Signals', value: String(activeCount), ok: true },
               { label: 'Signals (24h)', value: String(signals24h), ok: true },
+              { label: 'Suppression Rate', value: `${suppressionRate}%`, ok: true },
             ].map(item => (
               <div key={item.label}>
                 <p className="text-refinex-muted text-xs mb-1">{item.label}</p>
@@ -161,13 +166,13 @@ export default async function TransparencyPage() {
               Recent Signal Log
             </h2>
             <p className="text-refinex-secondary text-sm mb-4">
-              Last {Math.min(history.length, 10)} signals processed by the engine, including suppressed output.
+              Last {history.length} signals — {deliveredCount} delivered, {suppressedCount} suppressed ({suppressionRate}% suppression rate)
             </p>
             <div className="overflow-x-auto">
               <table className="w-full text-xs font-mono">
                 <thead>
                   <tr className="text-refinex-muted border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-                    {['Region', 'Instance', 'Confidence', 'Action', 'Savings', 'Suppressed'].map(h => (
+                    {['Region', 'Instance', 'Confidence', 'Action', 'Savings', 'Suppressed', 'Reason'].map(h => (
                       <th key={h} className="text-left pb-2 pr-4 font-medium">{h}</th>
                     ))}
                   </tr>
@@ -184,6 +189,11 @@ export default async function TransparencyPage() {
                         <span style={{ color: s.suppressed ? '#EF4444' : '#10B981' }}>
                           {s.suppressed ? 'Yes' : 'No'}
                         </span>
+                      </td>
+                      <td className="py-2 pr-4" style={{ color: '#64748B', fontSize: '11px' }}>
+                        {s.suppression_reason
+                          ? s.suppression_reason.replace(/_/g, ' ')
+                          : s.suppressed ? 'ttl expired' : '—'}
                       </td>
                     </tr>
                   ))}

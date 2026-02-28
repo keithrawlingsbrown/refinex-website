@@ -69,26 +69,38 @@ export async function getSuppressedSignals(): Promise<any[]> {
   } catch { return []; }
 }
 
-export async function getPublicSignalHistory(): Promise<any[]> {
+export async function getPublicSignalHistory(): Promise<{
+  signals: any[];
+  suppression_rate: number;
+  delivered: number;
+  suppressed: number;
+}> {
   try {
     const res = await fetch(
       `${API_URL}/v1/signals/public?limit=20`,
       { next: { revalidate: 60 } }
     );
-    if (!res.ok) return [];
+    if (!res.ok) return { signals: [], suppression_rate: 0, delivered: 0, suppressed: 0 };
     const data = await res.json();
-    const signals = data.signals || [];
-    return signals.map((s: any) => ({
+    const signals = (data.signals || []).map((s: any) => ({
       region: s.region ?? '—',
       instance_type: s.instance_type ?? '—',
       confidence: s.confidence ?? 0,
       savings_pct: s.savings_pct ?? null,
       action: s.action ?? '—',
       suppressed: s.suppressed ?? false,
-      regime: s.regime ?? '—',
+      suppression_reason: s.suppression_reason ?? null,
       created_at: s.created_at ?? null,
     }));
-  } catch { return []; }
+    return {
+      signals,
+      suppression_rate: data.suppression_rate ?? 0,
+      delivered: data.delivered ?? 0,
+      suppressed: data.suppressed ?? 0,
+    };
+  } catch {
+    return { signals: [], suppression_rate: 0, delivered: 0, suppressed: 0 };
+  }
 }
 
 export async function getSystemHealth(): Promise<any> {
