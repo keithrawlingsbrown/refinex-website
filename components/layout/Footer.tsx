@@ -16,6 +16,7 @@ export default function Footer() {
               <p className="text-refinex-secondary text-xs font-semibold uppercase tracking-widest mb-3">Product</p>
               <div className="flex flex-col gap-2">
                 <Link href="/pricing" className="text-refinex-muted hover:text-refinex-primary text-sm transition-colors">Pricing</Link>
+                <Link href="/blog" className="text-refinex-muted hover:text-refinex-primary text-sm transition-colors">Blog</Link>
                 <Link href="/transparency" className="text-refinex-muted hover:text-refinex-primary text-sm transition-colors">Signal Transparency</Link>
                 <Link href="/api-reference" className="text-refinex-muted hover:text-refinex-primary text-sm transition-colors">API Reference</Link>
               </div>

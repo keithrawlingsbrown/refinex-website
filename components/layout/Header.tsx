@@ -8,6 +8,7 @@ const navigation = [
   { name: 'Docs', href: '/docs' },
   { name: 'API Reference', href: '/api-reference' },
   { name: 'Pricing', href: '/pricing' },
+  { name: 'Blog', href: '/blog' },
   { name: 'Transparency', href: '/transparency' },
 ]
 
