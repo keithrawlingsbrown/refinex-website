@@ -6,6 +6,9 @@ import { ShareButtons } from '@/components/blog/ShareButtons';
 
 const SITE_URL = 'https://www.refinex.io';
 
+// Force dynamic so posts render at request-time (filesystem always correct at runtime)
+export const dynamic = 'force-dynamic';
+
 export async function generateStaticParams() {
   return getAllPosts().map(p => ({ slug: p.slug }));
 }
