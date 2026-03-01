@@ -2,6 +2,9 @@ import { getPost, getAllPosts } from '@/lib/posts';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
+import { ShareButtons } from '@/components/blog/ShareButtons';
+
+const SITE_URL = 'https://www.refinex.io';
 
 export async function generateStaticParams() {
   return getAllPosts().map(p => ({ slug: p.slug }));
@@ -10,21 +13,43 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const post = getPost(params.slug);
   if (!post) return {};
-  return { title: `${post.title} — RefineX`, description: post.description };
+  return {
+    title: `${post.title} — RefineX`,
+    description: post.description,
+    openGraph: {
+      title: post.title,
+      description: post.description,
+      type: 'article',
+      url: `${SITE_URL}/blog/${post.slug}`,
+      siteName: 'RefineX',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.description,
+      site: '@Refinexapi',
+    },
+  };
 }
 
 export default function PostPage({ params }: { params: { slug: string } }) {
   const post = getPost(params.slug);
   if (!post) notFound();
 
+  const postUrl = `${SITE_URL}/blog/${post.slug}`;
+
   return (
     <main className="min-h-screen px-6 py-24" style={{ background: '#0A0F1E' }}>
       <div className="max-w-2xl mx-auto">
+
+        {/* Back link */}
         <Link href="/blog" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-blue-400 mb-12 transition-colors">
           ← Back to blog
         </Link>
+
+        {/* Post header */}
         <div className="mb-10">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
             <span className="text-xs text-slate-500">{post.date}</span>
             <span className="text-xs text-slate-600">·</span>
             <span className="text-xs text-slate-500">{post.readingTime} min read</span>
@@ -38,7 +63,10 @@ export default function PostPage({ params }: { params: { slug: string } }) {
           <h1 className="text-3xl font-bold text-white mb-4">{post.title}</h1>
           <p className="text-slate-400 text-lg leading-relaxed">{post.description}</p>
         </div>
+
         <hr style={{ borderColor: 'rgba(255,255,255,0.06)', marginBottom: '2.5rem' }} />
+
+        {/* Post body */}
         <div className="prose prose-invert prose-slate max-w-none
           prose-headings:text-white prose-headings:font-semibold
           prose-p:text-slate-300 prose-p:leading-relaxed
@@ -49,21 +77,71 @@ export default function PostPage({ params }: { params: { slug: string } }) {
           prose-blockquote:border-blue-500 prose-blockquote:text-slate-400">
           <ReactMarkdown>{post.content}</ReactMarkdown>
         </div>
-        <div className="mt-16 pt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-          <p className="text-slate-500 text-sm mb-4">Want to see the signals behind this analysis?</p>
-          <div className="flex gap-4">
+
+        {/* Share row — sits right below article body */}
+        <div className="mt-10 mb-12">
+          <ShareButtons url={postUrl} title={post.title} description={post.description} />
+        </div>
+
+        {/* Conversion CTA */}
+        <div className="rounded-2xl p-8"
+          style={{ background: 'linear-gradient(135deg, rgba(37,99,235,0.12) 0%, rgba(15,23,42,0.8) 100%)', border: '1px solid rgba(37,99,235,0.25)' }}>
+          <div className="flex items-start gap-3 mb-4">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+              style={{ background: 'rgba(37,99,235,0.2)', border: '1px solid rgba(37,99,235,0.3)' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m3 11 19-9-9 19-2-8-8-2z"/>
+              </svg>
+            </div>
+            <div>
+              <p className="text-white font-semibold text-base mb-1">See this analysis live</p>
+              <p className="text-slate-400 text-sm leading-relaxed">
+                The data behind this post comes from the RefineX signal engine — running in real time, logging every signal it generates and every one it suppresses. Free to inspect, no account required.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-3 mt-6">
             <Link href="/transparency"
-              className="px-4 py-2 rounded-lg text-sm font-medium text-blue-400 transition-colors"
-              style={{ background: 'rgba(37,99,235,0.15)', border: '1px solid rgba(37,99,235,0.3)' }}>
-              View live signal log →
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-blue-400 transition-all"
+              style={{ background: 'rgba(37,99,235,0.15)', border: '1px solid rgba(37,99,235,0.3)' }}
+              onMouseEnter={undefined}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+              </svg>
+              View live signal log
             </Link>
+
             <Link href="/portal"
-              className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white transition-all"
               style={{ background: '#2563EB' }}>
-              Get API access →
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/>
+              </svg>
+              Get API access — free
+            </Link>
+
+            <Link href="/docs"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#94A3B8' }}>
+              Read the docs →
             </Link>
           </div>
+
+          <p className="mt-4 text-xs text-slate-600">
+            Advisory signals only — not financial or infrastructure advice.
+          </p>
         </div>
+
+        {/* Bottom share + nav */}
+        <div className="mt-10 flex items-center justify-between flex-wrap gap-4">
+          <ShareButtons url={postUrl} title={post.title} description={post.description} />
+          <Link href="/blog" className="text-sm text-slate-500 hover:text-blue-400 transition-colors">
+            ← More posts
+          </Link>
+        </div>
+
       </div>
     </main>
   );
