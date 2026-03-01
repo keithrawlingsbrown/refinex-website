@@ -2,7 +2,14 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 
-const POSTS_DIR = process.env.POSTS_DIR || path.join(process.cwd(), 'content', 'posts');
+// Resolve content directory — try env var first, then cwd-relative, then /app absolute
+function resolvePostsDir(): string {
+  if (process.env.POSTS_DIR) return process.env.POSTS_DIR;
+  const cwdRelative = path.join(process.cwd(), 'content', 'posts');
+  if (fs.existsSync(cwdRelative)) return cwdRelative;
+  return '/app/content/posts'; // Docker container absolute fallback
+}
+const POSTS_DIR = resolvePostsDir();
 
 export interface PostMeta {
   slug: string;
