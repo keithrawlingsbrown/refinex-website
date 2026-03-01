@@ -37,6 +37,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 # Copy blog post content so getPost() can read files at runtime
 COPY --from=builder --chown=nextjs:nodejs /app/content ./content
+ENV POSTS_DIR /app/content/posts
 
 # Create data directory for SQLite
 RUN mkdir -p /app/data
