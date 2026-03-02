@@ -13,8 +13,9 @@ export async function generateStaticParams() {
   return getAllPosts().map(p => ({ slug: p.slug }));
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const post = getPost(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const post = getPost(slug);
   if (!post) return {};
   return {
     title: `${post.title} — RefineX`,
@@ -35,8 +36,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default function PostPage({ params }: { params: { slug: string } }) {
-  const post = getPost(params.slug);
+export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const post = getPost(slug);
   if (!post) notFound();
 
   const postUrl = `${SITE_URL}/blog/${post.slug}`;
