@@ -20,18 +20,23 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `${post.title} — RefineX`,
     description: post.description,
+    authors: [{ name: 'Keith Brown', url: 'https://www.refinex.io/blog' }],
     openGraph: {
       title: post.title,
       description: post.description,
       type: 'article',
       url: `${SITE_URL}/blog/${post.slug}`,
       siteName: 'RefineX',
+      authors: ['Keith Brown'],
+      publishedTime: post.date ? new Date(post.date).toISOString() : undefined,
+      tags: post.tags,
     },
     twitter: {
       card: 'summary_large_image',
       title: post.title,
       description: post.description,
       site: '@Refinexapi',
+      creator: '@Refinexapi',
     },
   };
 }

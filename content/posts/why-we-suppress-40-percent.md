@@ -49,3 +49,7 @@ A suppression rate above 80% during a compressed market period means the engine 
 The signal log is public. The suppression reasons are logged. You can verify the behavior yourself.
 
 [View the live signal log →](https://www.refinex.io/transparency)
+
+---
+*Keith Brown*
+*CTO, RefineX*

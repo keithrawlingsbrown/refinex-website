@@ -67,3 +67,7 @@ AWS's five buckets do not tell you when the model's confidence in its own histor
 That asymmetry is the design. Overfiring destroys trust faster than underfiring. One bad signal and engineers disable the integration. The suppression rate is not a metric to minimize — it is evidence of discipline.
 
 [View the live signal log →](https://www.refinex.io/transparency)
+
+---
+*Keith Brown*
+*CTO, RefineX*

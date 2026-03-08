@@ -16,7 +16,7 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://refinex.io'),
+  metadataBase: new URL('https://www.refinex.io'),
   title: 'RefineX — Spot instance intelligence for your autoscaler',
   description: 'Confidence-scored AWS spot market signals with regime context. API-first advisory signals for FinOps teams, Kubernetes autoscalers, and CI/CD pipelines.',
   keywords: ['spot instances', 'AWS', 'cost optimization', 'kubernetes', 'autoscaling', 'FinOps', 'spot market signals'],
