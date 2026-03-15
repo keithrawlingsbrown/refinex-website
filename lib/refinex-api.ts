@@ -26,6 +26,17 @@ export async function getActiveSignal(): Promise<any> {
   } catch { return null; }
 }
 
+export async function getSignalNow(): Promise<any> {
+  try {
+    const res = await fetch(
+      `${API_URL}/v1/signals/now`,
+      { next: { revalidate: 30 } }
+    );
+    if (!res.ok) return null;
+    return await res.json();
+  } catch { return null; }
+}
+
 export async function getSignalHistory(): Promise<any[]> {
   try {
     const res = await fetch(
