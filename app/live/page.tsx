@@ -156,11 +156,11 @@ export default async function LivePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a
-              href="/pricing"
+              href="/docs/quickstart"
               className="inline-flex items-center justify-center px-6 py-3 rounded-lg text-sm font-semibold"
               style={{ background: '#2563EB', color: '#fff' }}
             >
-              Get API Access
+              Start free — 90 days
             </a>
             <a
               href="/transparency"

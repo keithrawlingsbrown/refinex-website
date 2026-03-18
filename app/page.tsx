@@ -23,12 +23,12 @@ export default function Home() {
             Ready to Reduce Compute Waste?
           </h2>
           <p className="text-xl text-refinex-secondary mb-8">
-            Start with our free tier. No cloud credentials required.
+            Full API access, free for 90 days. No credit card. No cloud credentials required.
           </p>
           <div className="flex gap-4 justify-center">
             <Link href="/docs/quickstart"
               className="inline-flex items-center justify-center px-6 py-3 rounded-lg font-semibold btn-blue">
-              Get Started
+              Start free — 90 days
             </Link>
             <Link href="/api-reference"
               className="inline-flex items-center justify-center px-6 py-3 rounded-lg font-semibold btn-outline-subtle">

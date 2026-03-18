@@ -24,7 +24,7 @@ const docSections = [
   {
     icon: DollarSign,
     title: 'Pricing & Billing',
-    description: 'Usage-based model details.',
+    description: 'Early access details and coming tiers.',
     href: '/pricing',
   },
   {
@@ -36,7 +36,7 @@ const docSections = [
   {
     icon: FileText,
     title: 'Technical Specs',
-    description: 'YC-credible technical overview.',
+    description: 'Field-level technical specifications.',
     href: '/specs',
   },
 ]

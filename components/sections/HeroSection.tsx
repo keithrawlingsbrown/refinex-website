@@ -63,10 +63,10 @@ export default async function HeroSection() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/pricing"
+              <Link href="/docs/quickstart"
                 className="inline-flex items-center justify-center px-6 py-3 rounded-lg font-semibold text-white transition-all hover:opacity-90"
                 style={{ background: '#2563EB' }}>
-                Get API access
+                Start free — 90 days
               </Link>
               <Link href="/transparency"
                 className="inline-flex items-center justify-center px-6 py-3 rounded-lg font-semibold transition-all text-refinex-secondary hover:text-refinex-primary"
