@@ -10,6 +10,13 @@ const nextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
   },
+  // Explicitly declare public env vars so Turbopack inlines them at build time.
+  // Turbopack does not reliably replace process.env.NEXT_PUBLIC_* inside
+  // useEffect callbacks — declaring here forces static substitution.
+  env: {
+    NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
+    NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+  },
   async redirects() {
     return [
       {
