@@ -28,6 +28,14 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: 'RefineX',
     url: 'https://refinex.io',
+    images: [
+      {
+        url: 'https://www.refinex.io/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'RefineX — Spot instance intelligence',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
