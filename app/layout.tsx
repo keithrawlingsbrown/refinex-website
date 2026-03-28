@@ -56,7 +56,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <body className="min-h-screen flex flex-col">
-        <PostHogProvider>
+        <PostHogProvider
+          posthogKey={process.env.NEXT_PUBLIC_POSTHOG_KEY ?? ''}
+          posthogHost={process.env.NEXT_PUBLIC_POSTHOG_HOST ?? 'https://us.i.posthog.com'}
+        >
           <Header />
           <main className="flex-1">
             {children}

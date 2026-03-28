@@ -5,10 +5,9 @@ import { PostHogProvider as PHProvider } from 'posthog-js/react';
 import { useEffect, Suspense } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 
-// Access at module scope — Turbopack inlines NEXT_PUBLIC_* reliably here,
-// not inside useEffect callbacks where static analysis can't reach it.
-const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com';
+// Key and host are passed as props from layout.tsx (a Server Component).
+// Server Components reliably inline process.env.NEXT_PUBLIC_* at build time.
+// Turbopack does NOT inline them in 'use client' files regardless of scope.
 
 function PostHogPageview() {
   const pathname = usePathname();
@@ -26,18 +25,24 @@ function PostHogPageview() {
   return null;
 }
 
-export function PostHogProvider({ children }: { children: React.ReactNode }) {
-  useEffect(() => {
-    if (!POSTHOG_KEY) return;
+interface PostHogProviderProps {
+  children: React.ReactNode;
+  posthogKey: string;
+  posthogHost: string;
+}
 
-    posthog.init(POSTHOG_KEY, {
-      api_host: POSTHOG_HOST,
+export function PostHogProvider({ children, posthogKey, posthogHost }: PostHogProviderProps) {
+  useEffect(() => {
+    if (!posthogKey) return;
+
+    posthog.init(posthogKey, {
+      api_host: posthogHost,
       capture_pageview: false, // handled manually via PostHogPageview
       capture_pageleave: true,
       autocapture: true,
       persistence: 'localStorage+cookie',
     });
-  }, []);
+  }, [posthogKey, posthogHost]);
 
   return (
     <PHProvider client={posthog}>
