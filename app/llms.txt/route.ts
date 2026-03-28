@@ -33,6 +33,25 @@ RefineX monitors AWS EC2 Spot instance pricing across regions in real time, scor
 
 **Audit trail**: Append-only. No UPDATE or DELETE on signal or suppression records. The log is permanent.
 
+## Developer Tools (pip install, no build step)
+
+CLI — live spot signals in your terminal:
+  pip install refinex-cli
+  refinex now          # best signal right now, no API key required
+  refinex log          # suppression log, no API key required
+  refinex watch        # poll loop, prints on signal change
+  refinex signals      # filtered list, requires API key
+  GitHub: https://github.com/keithrawlingsbrown/refinex-cli
+  PyPI: https://pypi.org/project/refinex-cli/
+
+MCP server — use RefineX inside Claude Code and Cursor:
+  pip install refinex-mcp
+  Tools (no auth): get_live_signal, get_suppression_log, get_health
+  Tools (API key): list_signals, get_signal_for_instance, get_signals_summary
+  Claude Code: add to ~/.claude/settings.json mcpServers.refinex
+  GitHub: https://github.com/keithrawlingsbrown/refinex-mcp
+  PyPI: https://pypi.org/project/refinex-mcp/
+
 ## Public API (no key required)
 
 Live signal endpoint:

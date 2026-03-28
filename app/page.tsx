@@ -5,6 +5,7 @@ import IntegrationBar from '@/components/IntegrationBar'
 import FeaturesSection from '@/components/sections/FeaturesSection'
 import HowItWorksSection from '@/components/sections/HowItWorksSection'
 import QuickstartSection from '@/components/sections/QuickstartSection'
+import DeveloperToolsSection from '@/components/sections/DeveloperToolsSection'
 import Link from 'next/link'
 
 export default function Home() {
@@ -15,6 +16,7 @@ export default function Home() {
       <FeaturesSection />
       <HowItWorksSection />
       <QuickstartSection />
+      <DeveloperToolsSection />
 
       {/* Final CTA */}
       <section className="py-20 px-6">
