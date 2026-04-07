@@ -241,4 +241,4 @@ docker logs <container-id>
 
 For deployment issues:
 - GitHub Issues: [repository-url]/issues
-- Email: support@refinex.io
+- Email: keith@getrefinex.com

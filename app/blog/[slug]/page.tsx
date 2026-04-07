@@ -35,8 +35,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       card: 'summary_large_image',
       title: post.title,
       description: post.description,
-      site: '@Refinexapi',
-      creator: '@Refinexapi',
+      site: '@getrefinex',
+      creator: '@getrefinex',
     },
   };
 }

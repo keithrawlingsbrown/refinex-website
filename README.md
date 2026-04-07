@@ -212,5 +212,5 @@ Proprietary - RefineX
 ## Support
 
 For issues or questions:
-- Email: support@refinex.io
+- Email: keith@getrefinex.com
 - GitHub Issues: [repository-url]/issues

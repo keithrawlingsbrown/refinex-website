@@ -15,7 +15,7 @@ export default function Terms() {
         continuous automated polling beyond your rate tier, competitive intelligence extraction.
       </p>
       <p className="text-refinex-secondary leading-relaxed">
-        For questions: legal@refinex.io
+        For questions: keith@getrefinex.com
       </p>
     </main>
   );

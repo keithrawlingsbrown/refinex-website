@@ -98,7 +98,7 @@ suppressed, confidence band, regime, audit trail, advisory-only, deterministic, 
 
 - Website: https://www.refinex.io
 - API: https://refinex-api.onrender.com
-- Twitter/X: https://x.com/refinexapi
+- Twitter/X: https://x.com/getrefinex
 - Founded: 2026 | Phase: pre-revenue early access
 `;
 

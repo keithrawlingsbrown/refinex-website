@@ -15,7 +15,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Blog — RefineX',
     description: 'Engineering insights on AWS spot markets, signal design, and infrastructure cost intelligence.',
-    site: '@Refinexapi',
+    site: '@getrefinex',
   },
 };
 

@@ -12,7 +12,7 @@ export default function Privacy() {
         to operate the service (payment processing via Stripe, error monitoring via Sentry).
       </p>
       <p className="text-refinex-secondary leading-relaxed">
-        For questions: privacy@refinex.io
+        For questions: keith@getrefinex.com
       </p>
     </main>
   );

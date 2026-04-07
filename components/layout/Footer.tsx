@@ -19,8 +19,8 @@ const GitHubIcon = () => (
 );
 
 const socialLinks = [
-  { href: 'https://x.com/Refinexapi', label: 'RefineX on X', Icon: XIcon },
-  { href: 'https://www.linkedin.com/company/refinex-api', label: 'RefineX on LinkedIn', Icon: LinkedInIcon },
+  { href: 'https://x.com/getrefinex', label: 'RefineX on X', Icon: XIcon },
+  { href: 'https://www.linkedin.com/company/getrefinex', label: 'RefineX on LinkedIn', Icon: LinkedInIcon },
   { href: 'https://github.com/keithrawlingsbrown', label: 'RefineX on GitHub', Icon: GitHubIcon },
 ];
 
@@ -70,8 +70,8 @@ export default function Footer() {
               <div className="flex flex-col gap-2">
                 <Link href="/blog" className="text-refinex-muted hover:text-refinex-primary text-sm transition-colors">Blog</Link>
                 <Link href="/enterprise" className="text-refinex-muted hover:text-refinex-primary text-sm transition-colors">Enterprise</Link>
-                <a href="mailto:admin@refinex.io" className="text-refinex-muted hover:text-refinex-primary text-sm transition-colors">Contact</a>
-                <a href="https://x.com/Refinexapi" target="_blank" rel="noopener noreferrer" className="text-refinex-muted hover:text-refinex-primary text-sm transition-colors">@Refinexapi</a>
+                <a href="mailto:keith@getrefinex.com" className="text-refinex-muted hover:text-refinex-primary text-sm transition-colors">Contact</a>
+                <a href="https://x.com/getrefinex" target="_blank" rel="noopener noreferrer" className="text-refinex-muted hover:text-refinex-primary text-sm transition-colors">@getrefinex</a>
               </div>
             </div>
             <div>
@@ -86,7 +86,7 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-12 pt-8 section-divider flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-refinex-muted text-sm">© 2026 RefineX. All rights reserved.</p>
+          <p className="text-refinex-muted text-sm">© 2026 RefineX. 1300 South Columbus Blvd. Ste. 1, Philadelphia, PA 19147</p>
           <div className="flex items-center gap-5">
             <p className="text-refinex-muted text-xs">Advisory signals only. Not financial or infrastructure advice.</p>
             <div className="flex items-center gap-3">

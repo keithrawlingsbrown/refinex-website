@@ -15,7 +15,7 @@ export function ShareButtons({ url, title, description }: ShareButtonsProps) {
   const encodedText = encodeURIComponent(`${title}\n\n${description}`);
   const encodedTitle = encodeURIComponent(title);
 
-  const xHref        = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodedUrl}&via=Refinexapi`;
+  const xHref        = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodedUrl}&via=getrefinex`;
   const linkedinHref = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
   const emailHref    = `mailto:?subject=${encodedTitle}&body=${encodedText}%0A%0A${encodedUrl}`;
   const smsHref      = `sms:?body=${encodeURIComponent(title + ' ' + url)}`;
