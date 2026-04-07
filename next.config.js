@@ -5,6 +5,10 @@ const withMDX = require('@next/mdx')({
 
 const nextConfig = {
   output: 'standalone',
+  outputFileTracingIncludes: {
+    '/blog': ['./content/posts/**/*'],
+    '/blog/[slug]': ['./content/posts/**/*'],
+  },
   reactStrictMode: true,
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   images: {
