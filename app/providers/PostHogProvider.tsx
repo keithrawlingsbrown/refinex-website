@@ -36,7 +36,8 @@ export function PostHogProvider({ children, posthogKey, posthogHost }: PostHogPr
     if (!posthogKey) return;
 
     posthog.init(posthogKey, {
-      api_host: posthogHost,
+      api_host: '/ingest',
+      ui_host: 'https://us.posthog.com',
       capture_pageview: false, // handled manually via PostHogPageview
       capture_pageleave: true,
       autocapture: true,
