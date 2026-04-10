@@ -12,6 +12,9 @@ out/
 build/
 dist/
 
+# Generated at build time by scripts/build-posts-manifest.js
+lib/posts-manifest.json
+
 # Production
 *.log
 npm-debug.log*

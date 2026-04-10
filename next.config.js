@@ -5,10 +5,9 @@ const withMDX = require('@next/mdx')({
 
 const nextConfig = {
   output: 'standalone',
-  outputFileTracingIncludes: {
-    '/blog': ['./content/posts/**/*'],
-    '/blog/[slug]': ['./content/posts/**/*'],
-  },
+  // NOTE: outputFileTracingIncludes was removed. Blog posts are now loaded
+  // from a build-time manifest (lib/posts-manifest.json) instead of filesystem.
+  // See scripts/build-posts-manifest.js for ADR and history.
   reactStrictMode: true,
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   images: {
