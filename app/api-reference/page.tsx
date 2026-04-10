@@ -156,7 +156,7 @@ export default function APIReferencePage() {
                     {endpoint.description}
                     {endpoint.primary && (
                       <span className="ml-2 text-refinex-cyan text-xs">
-                        ★ Primary endpoint
+                        — Primary endpoint
                       </span>
                     )}
                   </p>

@@ -16,7 +16,7 @@ export default function SignalBadge({ type, confidence, className }: SignalBadge
     interruption_risk: {
       color: 'bg-semantic-warning',
       text: 'Interruption Risk',
-      icon: '⚠',
+      icon: '△',
     },
   }
 
