@@ -79,6 +79,7 @@ export default function Footer() {
               <div className="flex flex-col gap-2">
                 <Link href="/privacy" className="text-refinex-muted hover:text-refinex-primary text-sm transition-colors">Privacy</Link>
                 <Link href="/terms" className="text-refinex-muted hover:text-refinex-primary text-sm transition-colors">Terms</Link>
+                <a href="#" className="termly-display-preferences text-refinex-muted hover:text-refinex-primary text-sm transition-colors">Consent Preferences</a>
               </div>
             </div>
           </div>
