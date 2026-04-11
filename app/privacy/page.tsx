@@ -1,19 +1,26 @@
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy — RefineX',
+  description: 'How RefineX collects, uses, and protects your personal information. GDPR, CCPA, and US state law compliant.',
+}
+
 export default function Privacy() {
   return (
-    <main className="max-w-2xl mx-auto px-6 py-32">
-      <h1 className="text-3xl font-bold text-refinex-primary mb-6">Privacy Policy</h1>
-      <p className="text-refinex-secondary leading-relaxed mb-4">
-        RefineX collects API usage metadata (request counts, endpoint, timestamp, API key identifier)
-        for billing and rate limiting purposes. We do not collect, store, or analyze your
-        infrastructure data, spot instance decisions, or workload characteristics.
-      </p>
-      <p className="text-refinex-secondary leading-relaxed mb-4">
-        We do not sell data. We do not share data with third parties except as required
-        to operate the service (payment processing via Stripe, error monitoring via Sentry).
-      </p>
-      <p className="text-refinex-secondary leading-relaxed">
-        For questions: keith@getrefinex.com
-      </p>
+    <main className="min-h-screen" style={{ background: '#0A0F1E' }}>
+      <div className="max-w-4xl mx-auto px-6 py-24">
+        <iframe
+          src="/legal/privacy-policy.html"
+          title="RefineX Privacy Policy"
+          className="w-full rounded-xl border"
+          style={{
+            minHeight: '80vh',
+            height: '4000px',
+            border: '1px solid rgba(255,255,255,0.06)',
+            background: '#ffffff',
+          }}
+        />
+      </div>
     </main>
-  );
+  )
 }
