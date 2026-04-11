@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter, JetBrains_Mono } from 'next/font/google'
+import Script from 'next/script'
 import './globals.css'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
@@ -56,10 +57,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <head>
-        <script
-          type="text/javascript"
+        <Script
           src="https://app.termly.io/resource-blocker/6dc8ed3d-d082-4433-a866-e4ac24490e58?autoBlock=on"
-          async
+          strategy="beforeInteractive"
         />
       </head>
       <body className="min-h-screen flex flex-col">
