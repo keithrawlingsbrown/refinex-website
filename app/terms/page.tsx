@@ -1,22 +1,26 @@
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Terms of Service — RefineX',
+  description: 'Terms of Service for RefineX cloud infrastructure signal intelligence platform.',
+}
+
 export default function Terms() {
   return (
-    <main className="max-w-2xl mx-auto px-6 py-32">
-      <h1 className="text-3xl font-bold text-refinex-primary mb-6">Terms of Service</h1>
-      <p className="text-refinex-secondary leading-relaxed mb-4">
-        RefineX provides advisory cloud infrastructure signal intelligence. Signals are probabilistic and do not
-        constitute infrastructure management advice, financial advice, or execution instructions.
-      </p>
-      <p className="text-refinex-secondary leading-relaxed mb-4">
-        RefineX makes no guarantee of signal accuracy, savings realization, or system performance
-        outcomes. Customer retains sole decision authority over all infrastructure actions.
-      </p>
-      <p className="text-refinex-secondary leading-relaxed mb-4">
-        Prohibited uses: reverse engineering confidence calculation methods, sharing API keys,
-        continuous automated polling beyond your rate tier, competitive intelligence extraction.
-      </p>
-      <p className="text-refinex-secondary leading-relaxed">
-        For questions: keith@getrefinex.com
-      </p>
+    <main className="min-h-screen" style={{ background: '#0A0F1E' }}>
+      <div className="max-w-4xl mx-auto px-6 py-24">
+        <iframe
+          src="https://app.termly.io/policy-viewer/policy.html?policyUUID=d0b4fd82-ec1f-454f-9a64-00011ea3b783"
+          title="RefineX Terms of Service"
+          className="w-full rounded-xl border"
+          style={{
+            minHeight: '80vh',
+            height: '6000px',
+            border: '1px solid rgba(255,255,255,0.06)',
+            background: '#ffffff',
+          }}
+        />
+      </div>
     </main>
-  );
+  )
 }
