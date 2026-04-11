@@ -70,7 +70,7 @@ export default function Footer() {
               <div className="flex flex-col gap-2">
                 <Link href="/blog" className="text-refinex-muted hover:text-refinex-primary text-sm transition-colors">Blog</Link>
                 <Link href="/enterprise" className="text-refinex-muted hover:text-refinex-primary text-sm transition-colors">Enterprise</Link>
-                <a href="mailto:keith@getrefinex.com" className="text-refinex-muted hover:text-refinex-primary text-sm transition-colors">Contact</a>
+                <Link href="/contact" className="text-refinex-muted hover:text-refinex-primary text-sm transition-colors">Contact</Link>
                 <a href="https://x.com/getrefinex" target="_blank" rel="noopener noreferrer" className="text-refinex-muted hover:text-refinex-primary text-sm transition-colors">@getrefinex</a>
               </div>
             </div>
