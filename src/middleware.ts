@@ -77,11 +77,12 @@ export function middleware(request: NextRequest) {
   // Content Security Policy
   const cspDirectives = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Next.js needs unsafe-inline/eval for dev
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://app.termly.io", // Next.js + Termly consent banner
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https:",
-    "font-src 'self' data:",
-    "connect-src 'self' https://refinex-api.onrender.com",
+    "font-src 'self' data: https://app.termly.io",
+    "connect-src 'self' https://refinex-api.onrender.com https://app.termly.io https://us.i.posthog.com",
+    "frame-src 'self' https://app.termly.io", // Termly hosted policies (privacy + terms iframes)
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
