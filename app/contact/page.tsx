@@ -125,7 +125,7 @@ export default function ContactPage() {
         <div className="mt-12 rounded-xl p-6" style={{ background: 'rgba(37,99,235,0.08)', border: '1px solid rgba(37,99,235,0.15)' }}>
           <p className="text-sm text-slate-400">
             <span className="text-white font-medium">Mailing address:</span>{' '}
-            RefineX, 1500 Market Street, 12th Floor, Philadelphia, PA 19102
+            RefineX, 1300 South Columbus Blvd. Ste. 1, #1174, Philadelphia, PA 19147
           </p>
           <p className="text-xs text-slate-500 mt-2">
             This is a virtual business address. For fastest response, use email.
