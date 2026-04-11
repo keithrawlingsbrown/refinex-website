@@ -17,14 +17,14 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.refinex.io'),
-  title: 'RefineX — Spot instance intelligence for your autoscaler',
-  description: 'Confidence-scored AWS spot market signals with regime context. API-first advisory signals for FinOps teams, Kubernetes autoscalers, and CI/CD pipelines.',
-  keywords: ['spot instances', 'AWS', 'cost optimization', 'kubernetes', 'autoscaling', 'FinOps', 'spot market signals'],
+  title: 'RefineX — Cloud signal intelligence for your infrastructure',
+  description: 'Confidence-scored spot market signals with regime context. Advisory signal intelligence for DevOps teams, autoscalers, and CI/CD pipelines.',
+  keywords: ['spot instances', 'cloud', 'cost optimization', 'kubernetes', 'autoscaling', 'FinOps', 'signal intelligence', 'spot market'],
   authors: [{ name: 'RefineX' }],
   icons: { icon: '/favicon.svg' },
   openGraph: {
-    title: 'RefineX — Spot instance intelligence for your autoscaler',
-    description: 'Confidence-scored AWS spot market signals with regime context. API-first. Advisory-only. Built for FinOps teams who want data before decisions.',
+    title: 'RefineX — Cloud signal intelligence for your infrastructure',
+    description: 'Confidence-scored spot market signals with regime context. Delivered via API, MCP, CLI, and real-time dashboard. Advisory-only.',
     type: 'website',
     siteName: 'RefineX',
     url: 'https://refinex.io',
@@ -33,14 +33,14 @@ export const metadata: Metadata = {
         url: 'https://www.refinex.io/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'RefineX — Spot instance intelligence',
+        alt: 'RefineX — Cloud signal intelligence',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'RefineX — Spot instance intelligence for your autoscaler',
-    description: 'Confidence-scored AWS spot market signals with regime context. API-first. Advisory-only.',
+    title: 'RefineX — Cloud signal intelligence for your infrastructure',
+    description: 'Confidence-scored spot market signals with regime context. Advisory-only. Built for DevOps teams who want data before decisions.',
   },
   robots: {
     index: true,

@@ -3,10 +3,10 @@ import { BlogCard } from './BlogCard';
 
 export const metadata = {
   title: 'Blog — RefineX',
-  description: 'Engineering insights on AWS spot markets, signal design, and infrastructure cost intelligence.',
+  description: 'Engineering insights on spot markets, signal design, and infrastructure cost intelligence.',
   openGraph: {
     title: 'Blog — RefineX',
-    description: 'Engineering insights on AWS spot markets, signal design, and infrastructure cost intelligence.',
+    description: 'Engineering insights on spot markets, signal design, and infrastructure cost intelligence.',
     type: 'website',
     url: 'https://www.refinex.io/blog',
     siteName: 'RefineX',
@@ -14,7 +14,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Blog — RefineX',
-    description: 'Engineering insights on AWS spot markets, signal design, and infrastructure cost intelligence.',
+    description: 'Engineering insights on spot markets, signal design, and infrastructure cost intelligence.',
     site: '@getrefinex',
   },
 };

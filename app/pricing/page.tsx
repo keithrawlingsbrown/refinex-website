@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 const earlyAccessFeatures = [
   'Full API access — all signal types and endpoints',
-  'Confidence-scored AWS Spot signals across all regions',
+  'Confidence-scored spot market signals across all regions',
   'Regime context: STABLE_DISCOUNT, VOLATILE, RECOVERING',
   'Suppression log — public audit trail of every filtered signal',
   'No cloud credentials required — reads public pricing data only',

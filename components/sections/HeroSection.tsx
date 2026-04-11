@@ -52,14 +52,14 @@ export default async function HeroSection() {
             </div>
 
             <h1 className="text-5xl font-bold tracking-tight text-refinex-primary leading-tight mb-6">
-              Spot instance intelligence<br />
-              <span style={{ color: '#3B82F6' }}>for your autoscaler</span>
+              Cloud signal intelligence<br />
+              <span style={{ color: '#3B82F6' }}>for your infrastructure</span>
             </h1>
 
             <p className="text-lg text-refinex-secondary leading-relaxed mb-8 max-w-lg">
-              Confidence-scored AWS spot market signals with regime context.
-              API-first. Advisory-only. Built for FinOps teams who want
-              data before decisions.
+              Confidence-scored spot market signals with regime context.
+              Delivered via API, MCP, CLI, and real-time dashboard.
+              Advisory-only. Built for DevOps teams who want data before decisions.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">

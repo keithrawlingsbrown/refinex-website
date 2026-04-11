@@ -3,7 +3,7 @@ export default function Terms() {
     <main className="max-w-2xl mx-auto px-6 py-32">
       <h1 className="text-3xl font-bold text-refinex-primary mb-6">Terms of Service</h1>
       <p className="text-refinex-secondary leading-relaxed mb-4">
-        RefineX provides advisory spot market signals. Signals are probabilistic and do not
+        RefineX provides advisory cloud infrastructure signal intelligence. Signals are probabilistic and do not
         constitute infrastructure management advice, financial advice, or execution instructions.
       </p>
       <p className="text-refinex-secondary leading-relaxed mb-4">

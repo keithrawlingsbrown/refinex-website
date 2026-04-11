@@ -34,7 +34,7 @@ export default function Footer() {
           <div className="max-w-xs">
             <p className="text-refinex-primary font-bold text-lg mb-2">RefineX</p>
             <p className="text-refinex-muted text-sm mb-5">
-              Advisory spot market signals for cloud engineers and FinOps teams.
+              Cloud signal intelligence for DevOps engineers and FinOps teams.
             </p>
             <div className="flex items-center gap-2">
               {socialLinks.map(({ href, label, Icon }) => (
