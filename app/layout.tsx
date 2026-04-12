@@ -56,13 +56,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <head>
+      <body className="min-h-screen flex flex-col">
         <Script
           src="https://app.termly.io/resource-blocker/6dc8ed3d-d082-4433-a866-e4ac24490e58?autoBlock=on"
           strategy="beforeInteractive"
         />
-      </head>
-      <body className="min-h-screen flex flex-col">
         <PostHogProvider
           posthogKey={process.env.NEXT_PUBLIC_POSTHOG_KEY ?? ''}
           posthogHost={process.env.NEXT_PUBLIC_POSTHOG_HOST ?? 'https://us.i.posthog.com'}

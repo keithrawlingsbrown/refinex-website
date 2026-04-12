@@ -80,7 +80,10 @@ export default function Footer() {
                 <Link href="/privacy" className="text-refinex-muted hover:text-refinex-primary text-sm transition-colors">Privacy</Link>
                 <Link href="/terms" className="text-refinex-muted hover:text-refinex-primary text-sm transition-colors">Terms</Link>
                 <Link href="/cookies" className="text-refinex-muted hover:text-refinex-primary text-sm transition-colors">Cookies</Link>
-                <a href="#" className="termly-display-preferences text-refinex-muted hover:text-refinex-primary text-sm transition-colors">Consent Preferences</a>
+                <button
+                  className="termly-display-preferences text-refinex-muted hover:text-refinex-primary text-sm transition-colors text-left"
+                  type="button"
+                >Consent Preferences</button>
               </div>
             </div>
           </div>
