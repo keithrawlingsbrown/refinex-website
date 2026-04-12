@@ -17,6 +17,7 @@ export default function Header() {
   const pathname = usePathname()
   const [status, setStatus] = useState<'ok' | 'degraded' | 'loading'>('loading')
   const [isOpen, setIsOpen] = useState(false)
+  const [user, setUser] = useState<{ name?: string; email?: string } | null>(null)
 
   useEffect(() => {
     async function checkHealth() {
@@ -35,6 +36,21 @@ export default function Header() {
     checkHealth()
     const interval = setInterval(checkHealth, 60_000)
     return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
+    async function checkAuth() {
+      try {
+        const res = await fetch('/auth/profile')
+        if (res.ok) {
+          const data = await res.json()
+          setUser(data)
+        }
+      } catch {
+        // Not logged in
+      }
+    }
+    checkAuth()
   }, [])
 
   // Close mobile menu on route change
@@ -82,13 +98,41 @@ export default function Header() {
                 {status === 'ok' ? 'All systems operational' : status === 'degraded' ? 'Degraded' : '...'}
               </span>
             </div>
-            <a href="/auth/login?screen_hint=signup"
-              className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all"
-              style={{ background: '#2563EB' }}
-              onMouseEnter={e => (e.currentTarget.style.background = '#1D4ED8')}
-              onMouseLeave={e => (e.currentTarget.style.background = '#2563EB')}>
-              Get API Key
-            </a>
+            {user ? (
+              <>
+                <a href="/dashboard"
+                  className="text-sm font-medium transition-colors"
+                  style={{ color: '#94A3B8' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#F8FAFC')}
+                  onMouseLeave={e => (e.currentTarget.style.color = '#94A3B8')}>
+                  Dashboard
+                </a>
+                <a href="/auth/logout"
+                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium transition-all"
+                  style={{ background: 'rgba(255,255,255,0.06)', color: '#94A3B8' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#F8FAFC' }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = '#94A3B8' }}>
+                  Log Out
+                </a>
+              </>
+            ) : (
+              <>
+                <a href="/auth/login"
+                  className="text-sm font-medium transition-colors"
+                  style={{ color: '#94A3B8' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#F8FAFC')}
+                  onMouseLeave={e => (e.currentTarget.style.color = '#94A3B8')}>
+                  Log In
+                </a>
+                <a href="/auth/login?screen_hint=signup"
+                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all"
+                  style={{ background: '#2563EB' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#1D4ED8')}
+                  onMouseLeave={e => (e.currentTarget.style.background = '#2563EB')}>
+                  Get API Key
+                </a>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -129,12 +173,37 @@ export default function Header() {
                 </Link>
               ))}
               <div className="px-4 pt-3 mt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                <Link href="/portal"
-                  onClick={() => setIsOpen(false)}
-                  className="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-semibold text-white"
-                  style={{ background: '#2563EB' }}>
-                  Get API Key
-                </Link>
+                {user ? (
+                  <>
+                    <a href="/dashboard"
+                      onClick={() => setIsOpen(false)}
+                      className="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-semibold text-white mb-2"
+                      style={{ background: '#2563EB' }}>
+                      Dashboard
+                    </a>
+                    <a href="/auth/logout"
+                      onClick={() => setIsOpen(false)}
+                      className="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium"
+                      style={{ background: 'rgba(255,255,255,0.06)', color: '#94A3B8' }}>
+                      Log Out
+                    </a>
+                  </>
+                ) : (
+                  <>
+                    <a href="/auth/login"
+                      onClick={() => setIsOpen(false)}
+                      className="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-medium mb-2"
+                      style={{ background: 'rgba(255,255,255,0.06)', color: '#94A3B8' }}>
+                      Log In
+                    </a>
+                    <a href="/auth/login?screen_hint=signup"
+                      onClick={() => setIsOpen(false)}
+                      className="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-semibold text-white"
+                      style={{ background: '#2563EB' }}>
+                      Get API Key
+                    </a>
+                  </>
+                )}
               </div>
               <div className="px-4 pt-3">
                 <div className="flex items-center gap-1.5 text-xs">
