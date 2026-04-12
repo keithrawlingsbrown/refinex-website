@@ -2,6 +2,9 @@ import { auth0 } from '@/lib/auth0'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
+// Force dynamic rendering — Auth0 session check cannot run at build time
+export const dynamic = 'force-dynamic'
+
 export const metadata = {
   title: 'Dashboard — RefineX',
   description: 'Manage your RefineX API keys, usage, and account settings.',
