@@ -119,21 +119,18 @@ export default function PricingPage() {
           </p>
         </div>
 
-        {/* Coming Soon Tiers */}
+        {/* Paid Tiers */}
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-refinex-primary mb-2 text-center">
-            Paid Plans — Coming After Early Access
+            Paid Plans
           </h2>
           <p className="text-refinex-secondary text-center mb-8">
-            Early access members will be notified first. No automatic charges.
+            Upgrade when ready. Early access members receive priority pricing.
           </p>
           <div className="grid md:grid-cols-3 gap-4">
             {comingTiers.map((tier) => (
-              <div key={tier.name} className="rounded-xl p-6 opacity-75"
-                style={{ background: '#0F172A', border: '1px solid rgba(255,255,255,0.06)' }}>
-                <div className="text-xs font-semibold uppercase tracking-widest text-refinex-muted mb-3">
-                  Coming Soon
-                </div>
+              <div key={tier.name} className="rounded-xl p-6"
+                style={{ background: '#0F172A', border: '1px solid rgba(255,255,255,0.08)' }}>
                 <div className="text-xl font-bold text-refinex-primary mb-1">{tier.name}</div>
                 <div className="text-2xl font-bold mb-1" style={{ color: '#3B82F6' }}>
                   {tier.price}<span className="text-sm font-normal text-refinex-muted">{tier.period}</span>

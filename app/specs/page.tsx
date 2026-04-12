@@ -13,7 +13,7 @@ const specs = [
   { label: 'Signal TTL', value: '~15 minutes', note: 'Signals expire by design to prevent stale decisions' },
   { label: 'Authentication', value: 'API Key', note: 'Header-based: X-API-Key' },
   { label: 'Protocol', value: 'REST (JSON)', note: 'Standard HTTP methods' },
-  { label: 'Supported Clouds (MVP)', value: 'AWS', note: 'GCP and Azure: coming soon' },
+  { label: 'Supported Clouds', value: 'AWS', note: 'Additional cloud providers on the roadmap' },
   { label: 'Data Sources', value: 'Public pricing + market signals', note: 'No customer cloud account access required' },
   { label: 'Rate Limits', value: 'Tier-based', note: 'Free: 100 req/min, Paid: higher limits' },
 ]
@@ -161,7 +161,7 @@ export default function TechnicalSpecsPage() {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold text-white mb-2">Coming Soon</h3>
+              <h3 className="font-semibold text-white mb-2">Roadmap</h3>
               <ul className="space-y-2">
                 <li>• GCP Preemptible VMs</li>
                 <li>• Azure Spot VMs</li>
