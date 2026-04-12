@@ -82,13 +82,13 @@ export default function Header() {
                 {status === 'ok' ? 'All systems operational' : status === 'degraded' ? 'Degraded' : '...'}
               </span>
             </div>
-            <Link href="/portal"
+            <a href="/auth/login?screen_hint=signup"
               className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all"
               style={{ background: '#2563EB' }}
               onMouseEnter={e => (e.currentTarget.style.background = '#1D4ED8')}
               onMouseLeave={e => (e.currentTarget.style.background = '#2563EB')}>
               Get API Key
-            </Link>
+            </a>
           </div>
 
           {/* Mobile menu button */}

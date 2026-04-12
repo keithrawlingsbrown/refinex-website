@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { auth0 } from '@/lib/auth0'
 
 // Simple in-memory rate limiter (use Redis in production for multiple instances)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>()
@@ -44,11 +45,21 @@ setInterval(() => {
   }
 }, 3600000)
 
-export function middleware(request: NextRequest) {
-  const response = NextResponse.next()
+export async function middleware(request: NextRequest) {
+  // Auth0 middleware handles /auth/* routes (login, logout, callback, profile)
+  const authResponse = await auth0.middleware(request)
+
+  // If Auth0 handled the request (auth routes), return its response directly
+  // Auth0 sets specific headers for auth routes — check if it's an auth route
+  if (request.nextUrl.pathname.startsWith('/auth/')) {
+    return authResponse
+  }
+
+  // For all other routes, apply security headers to the auth response
+  const response = authResponse
 
   // Get client IP (handle various proxy headers)
-  const ip = 
+  const ip =
     request.headers.get('x-forwarded-for')?.split(',')[0] ||
     request.headers.get('x-real-ip') ||
     'unknown'
@@ -57,11 +68,11 @@ export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith('/api/')) {
     if (!rateLimit(ip, request.nextUrl.pathname)) {
       return new NextResponse(
-        JSON.stringify({ 
+        JSON.stringify({
           error: 'Rate limit exceeded. Please try again later.',
-          retryAfter: 600 
+          retryAfter: 600
         }),
-        { 
+        {
           status: 429,
           headers: {
             'Content-Type': 'application/json',
@@ -73,7 +84,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Security Headers (Applied to all routes)
-  
+
   // Content Security Policy
   const cspDirectives = [
     "default-src 'self'",
@@ -81,26 +92,26 @@ export function middleware(request: NextRequest) {
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https:",
     "font-src 'self' data: https://app.termly.io",
-    "connect-src 'self' https://refinex-api.onrender.com https://app.termly.io https://us.i.posthog.com",
-    "frame-src 'self' https://app.termly.io", // Termly hosted policies (privacy + terms iframes)
+    "connect-src 'self' https://refinex-api.onrender.com https://app.termly.io https://us.i.posthog.com https://refinex.us.auth0.com",
+    "frame-src 'self' https://app.termly.io https://refinex.us.auth0.com", // Termly + Auth0
     "frame-ancestors 'none'",
     "base-uri 'self'",
-    "form-action 'self'",
+    "form-action 'self' https://refinex.us.auth0.com", // Auth0 login form
   ]
   response.headers.set('Content-Security-Policy', cspDirectives.join('; '))
 
   // Prevent clickjacking
   response.headers.set('X-Frame-Options', 'DENY')
-  
+
   // Prevent MIME type sniffing
   response.headers.set('X-Content-Type-Options', 'nosniff')
-  
+
   // XSS Protection (legacy but doesn't hurt)
   response.headers.set('X-XSS-Protection', '1; mode=block')
-  
+
   // Referrer Policy (don't leak URLs to external sites)
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
-  
+
   // Permissions Policy (disable unnecessary features)
   response.headers.set(
     'Permissions-Policy',
