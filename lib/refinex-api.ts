@@ -114,6 +114,17 @@ export async function getPublicSignalHistory(): Promise<{
   }
 }
 
+export async function getRegionalSuppression(days: number = 30): Promise<any> {
+  try {
+    const res = await fetch(
+      `${API_URL}/v1/signals/public/regional?days=${days}`,
+      { next: { revalidate: 60 } }
+    );
+    if (!res.ok) return null;
+    return await res.json();
+  } catch { return null; }
+}
+
 export async function getSystemHealth(): Promise<any> {
   try {
     const res = await fetch(
