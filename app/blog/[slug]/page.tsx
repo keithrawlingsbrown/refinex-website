@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import { ShareButtons } from '@/components/blog/ShareButtons';
+import fs from 'fs';
+import path from 'path';
 
 const SITE_URL = 'https://www.refinex.io';
 
@@ -73,6 +75,34 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           <h1 className="text-3xl font-bold text-white mb-4">{post.title}</h1>
           <p className="text-slate-400 text-lg leading-relaxed">{post.description}</p>
         </div>
+
+        {/* Audio version */}
+        {(() => {
+          const audioMap: Record<string, string> = {
+            'when-data-center-in-war-zone': '/audio/blog/blog-01-when-data-center-in-war-zone.mp3',
+            'ceasefire-was-not-a-signal': '/audio/blog/blog-02-ceasefire-was-not-a-signal.mp3',
+            'april-22-ceasefire-expires': '/audio/blog/blog-05-april-22-ceasefire-expires.mp3',
+          };
+          const audioSrc = audioMap[post.slug];
+          if (!audioSrc) return null;
+          return (
+            <div className="rounded-lg p-4 mb-8"
+              style={{ background: 'rgba(37,99,235,0.06)', border: '1px solid rgba(37,99,235,0.15)' }}>
+              <div className="flex items-center gap-3 mb-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                </svg>
+                <span className="text-sm font-medium" style={{ color: '#3B82F6' }}>Listen to this post</span>
+                <span className="text-xs" style={{ color: '#475569' }}>Narrated by Keith Brown</span>
+              </div>
+              <audio controls className="w-full" style={{ height: '36px' }} preload="none">
+                <source src={audioSrc} type="audio/mpeg" />
+              </audio>
+            </div>
+          );
+        })()}
 
         <hr style={{ borderColor: 'rgba(255,255,255,0.06)', marginBottom: '2.5rem' }} />
 
