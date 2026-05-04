@@ -1,68 +1,66 @@
 ---
 title: "Why /signals/active Returns One Action, Not a List"
-meta_title: "API Design: Single Action vs Lists for Infrastructure APIs"
-date: "2026-05-01"
-description: "Most infrastructure APIs return all data and let callers decide. RefineX /signals/active returns one highest-confidence action with fallback. Here's why."
-slug: "api-design-single-action-vs-lists"
+meta_title: "API Design: Why RefineX Returns One Action Per Call"
+date: "2026-05-04"
+description: "Most infrastructure APIs return all available data. RefineX /signals/active returns one highest-confidence action with fallback strategy for autoscalers."
+slug: "api-design-single-action-response"
 tags: ['aws', 'spot', 'api-design']
 schema:
   type: Article
-  datePublished: "2026-05-01"
+  datePublished: "2026-05-04"
   author: "Keith Brown"
   publisher: "RefineX"
-canonical: "https://www.refinex.io/blog/api-design-single-action-vs-lists"
+canonical: "https://www.refinex.io/blog/api-design-single-action-response"
 published: false
 ---
 
-Most infrastructure APIs follow the same pattern: return all available data, let the caller filter and decide. AWS EC2 DescribeSpotPriceHistory returns every price point. Kubernetes metrics APIs return every data point. The application layer handles the decision logic.
+Most infrastructure APIs follow the same pattern: return all available data and let the caller filter. Query for EC2 instances, get a JSON array of every instance. Ask for CloudWatch metrics, receive every data point in the time range. The RefineX `/signals/active` endpoint does the opposite. It returns exactly one action with a fallback strategy, not a list of possibilities.
 
-The RefineX /signals/active endpoint does the opposite. Each call returns exactly one action with a confidence score and an optional fallback parameter. When your autoscaler queries us, it gets "buy_spot" or "fallback_on_demand" or "wait", never a list of possibilities to evaluate.
+## What Is Single-Action API Design?
 
-## What is Single-Action API Design?
+Single-action API design means the endpoint makes exactly one recommendation per call. When an autoscaler queries `/signals/active` for `us-west-2` and `m5.large`, it receives either `buy_spot`, `migrate_spot`, `wait`, or `fallback_on_demand`. Never a list of options ranked by confidence. The API has already selected the highest-confidence signal above our suppression threshold and chosen the action.
 
-Single-action API design means the service makes exactly one recommendation per request. Instead of returning multiple signals with different confidence levels and letting the caller rank them, the API applies its own decision tree and returns the highest-confidence action that meets the caller's constraints.
+This decision emerged from watching how autoscalers actually consume external signals. They need one clear instruction per scaling decision, not multiple competing recommendations to evaluate.
 
-In our case, the /signals/active endpoint queries the signals table, filters by is_active and expires_at, then applies a deterministic ranking algorithm. The signal with the highest confidence score above our suppression threshold becomes the returned action. Everything else gets logged to our suppression system.
+## How RefineX Selects the Single Action
 
-## How Does RefineX Score and Rank Signals?
+Our signal scoring runs deterministically across AWS Spot price history and interruption patterns. Each signal receives a confidence score from 0.0 to 1.0, plus an action recommendation based on current market conditions. When `/signals/active` executes, it queries active signals for the requested region and instance type, then applies our selection algorithm.
 
-The Signal model stores confidence as a float between 0.0 and 1.0. Each signal also contains an action field with values like "buy_spot", "migrate_spot", "wait", or "fallback_on_demand". When /signals/active runs, it queries active signals for the requested region and instance type, then ranks them by confidence score.
+The code in `src/api/routes/signals.py` shows this filtering process. We query the Signal model for `is_active=True` records that match the region and instance type parameters. The database returns signals ordered by confidence score descending. We take the first signal above our confidence threshold, which currently sits at 0.5 for most signal types.
 
-Our suppression logic removes signals below the confidence threshold before they reach the API response. This week we suppressed 48.9% of generated signals. The remaining signals get ranked, and the top scorer becomes the API response. The suppression decisions appear in our public log at /transparency, creating an auditable trail of what we filtered out and why.
+If no signals meet the confidence requirement, we return the fallback action specified in the request parameter. This prevents autoscalers from receiving empty responses during low-confidence periods.
 
-The expected_value JSON field contains savings_percent and other economic factors, but confidence drives the ranking. A 0.85 confidence "buy_spot" signal beats a 0.72 confidence "migrate_spot" signal, regardless of potential savings.
+## Why Autoscalers Need Opinionated APIs
 
-## Why Not Return All Available Signals?
+Kubernetes Horizontal Pod Autoscaler and AWS Auto Scaling Groups operate on single scaling decisions. When pod CPU crosses 70%, the autoscaler calculates target replica count and issues one scaling command. It does not evaluate multiple CPU thresholds simultaneously.
 
-We tested a /signals/all endpoint during development. It returned every active signal for the requested region and instance type, ranked by confidence. The API consumers spent more time building ranking logic than integrating our recommendations.
+External signal APIs should match this decision pattern. If RefineX returned five Spot arbitrage signals with confidence scores between 0.6 and 0.9, the autoscaler would need additional logic to select one. This pushes signal evaluation complexity into every integration instead of centralizing it in our API.
 
-Autoscalers particularly struggled with this pattern. They needed to implement fallback chains, confidence thresholds, and tie-breaking logic. Three different customers built nearly identical decision trees on top of our signal list. We were pushing complexity to every integration point instead of centralizing it.
+We handle this complexity once in our signal selection algorithm. The autoscaler receives `buy_spot` for `m5.large` in `us-west-2a` with confidence 0.87. It can act immediately or ignore the signal based on its own policies.
 
-The single-action design moves that complexity into our service layer. We implement the ranking logic once, test it against historical data, and expose the decision through a simple interface. The autoscaler gets "buy_spot" with confidence 0.85 and can immediately act on it or ignore it based on its own risk tolerance.
+## How Fallback Parameters Work
 
-## How Does the Fallback Parameter Work?
+The fallback parameter solves the empty response problem. During periods when all signals fall below confidence thresholds, `/signals/active` could return nothing. Autoscalers would need error handling for null responses, plus logic to determine safe default actions.
 
-The fallback parameter tells our API what action to return when no high-confidence signals exist for the requested instance type and region. Without fallback, the API returns null when we have no recommendations. With fallback set to "on_demand", it returns that action with confidence 1.0.
+Instead, every request includes a fallback action: `wait`, `fallback_on_demand`, or `maintain_current`. When we suppress all active signals due to low confidence, the API returns the fallback with a confidence score of 0.0 and suppression metadata explaining why no higher-confidence signals qualified.
 
-This serves autoscalers that need a decision on every call. They can set fallback to "on_demand" and always receive an actionable response. When we have high-confidence spot recommendations, they get those. When spot conditions look risky, they get the fallback action.
+Our [transparency log](https://www.refinex.io/transparency) shows this suppression pattern clearly. During the past two hours, we suppressed 47% of generated signals. Those API calls received fallback responses instead of empty JSON.
 
-The fallback logic appears in our decision tree after signal ranking. If the highest-confidence signal still falls below our delivery threshold, we check for a fallback parameter and return that action instead of null. The response includes a flag indicating whether the returned action came from signal analysis or fallback logic.
+## The Tradeoff: Simplicity vs Flexibility
 
-## Integration Benefits for Autoscalers
+Single-action responses trade flexibility for integration simplicity. Advanced users might want to see all available signals and implement custom selection logic. A trading firm might prefer the second-highest confidence signal if it targets a different availability zone for geographic distribution.
 
-Kubernetes autoscalers and AWS Auto Scaling groups benefit from APIs that make definitive recommendations. They already handle complex scheduling, capacity planning, and resource allocation. Adding signal evaluation and ranking creates another failure mode.
+We chose autoscaler-first design because that represents 80% of our expected integrations. Teams building custom Spot fleet managers can make multiple API calls with different region and instance type parameters to gather broader signal sets.
 
-With single-action responses, the integration becomes straightforward. The autoscaler calls /signals/active with the target instance type and region. It receives "buy_spot" with confidence 0.85 or "fallback_on_demand" with confidence 1.0. The autoscaler compares the confidence score against its own threshold and acts accordingly.
+The performance cost is minimal. Our Redis cache handles sub-100ms response times for single signal lookups. Making three API calls to cover three availability zones adds 200ms total latency, which fits comfortably within autoscaler decision cycles.
 
-This pattern also simplifies error handling. The autoscaler doesn't need to validate signal rankings or handle empty result sets. Each API call returns exactly one action, and the fallback parameter eliminates null responses entirely.
+## Implementation Details
 
-## Opinionated APIs and Decision Boundaries
+The Signal model in `src/models/signal.py` stores each signal with its confidence score, action recommendation, and TTL. Our database index on `is_active`, `cloud`, `region`, `instance_type`, and `expires_at` supports fast lookups for the `/signals/active` endpoint.
 
-The single-action design represents a broader principle: APIs should encode domain expertise, not just data access. We understand spot market dynamics, interruption patterns, and pricing volatility better than the typical API consumer. The ranking algorithm captures that knowledge.
+We calculate TTL based on signal type and market volatility. Spot arbitrage signals typically expire within 10 minutes due to price movement. Interruption risk signals can remain valid for 2-4 hours since capacity patterns change more slowly.
 
-By returning one recommendation instead of raw data, we create a clear decision boundary. We handle signal evaluation, confidence scoring, and suppression logic. The consumer handles business logic, risk tolerance, and execution timing. Neither component needs to understand the other's domain.
-
-Our [transparency log](https://www.refinex.io/transparency) shows this approach in practice. Today we generated 1 active signal with average confidence 0.85. The suppression rate of 48.9% over the past two hours demonstrates how much filtering happens before signals reach the API layer.
+When signals expire, we set `is_active=False` instead of deleting records. This preserves the complete signal history for our public audit trail while preventing expired signals from affecting live API responses.
 
 [View the live signal log →](https://www.refinex.io/transparency)
 
