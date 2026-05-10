@@ -1,56 +1,58 @@
 ---
-title: "How RefineX Classifies High Volatility Regions as Interruption Risk"
-meta_title: "Spot Interruption Risk Detection: 25% Volatility Threshold"
-date: "2026-05-08"
-description: "RefineX uses coefficient of variation >25% to classify volatile AWS regions as interruption risk rather than arbitrage opportunity. Here's how the detector works."
-slug: "spot-interruption-risk-volatility-threshold"
+title: "How RefineX Detects High-Volatility Regions as Spot Interruption Risk"
+meta_title: "Spot Interruption Risk Detection: RefineX Volatility Classification"
+date: "2026-05-10"
+description: "RefineX classifies AWS regions with >25% price volatility as interruption risk, not arbitrage. Learn how coefficient of variation drives migrate_spot actions."
+slug: "spot-interruption-risk-volatility-detection"
 tags: ['aws', 'spot', 'signal-design', 'interruption']
 schema:
   type: Article
-  datePublished: "2026-05-08"
+  datePublished: "2026-05-10"
   author: "Keith Brown"
   publisher: "RefineX"
-canonical: "https://www.refinex.io/blog/spot-interruption-risk-volatility-threshold"
+canonical: "https://www.refinex.io/blog/spot-interruption-risk-volatility-detection"
 published: false
 ---
 
-What is spot interruption risk detection? It is the process of identifying AWS regions and instance types where price volatility indicates high interruption probability rather than cost arbitrage opportunity. RefineX classifies any region-instance combination with a coefficient of variation above 25% as interruption risk, triggering migrate_spot actions instead of buy_spot recommendations.
+Not every spot pricing movement signals an arbitrage opportunity. When price volatility exceeds statistical thresholds in an AWS region, RefineX classifies that combination as interruption risk rather than potential savings. We use the coefficient of variation to distinguish between stable pricing environments and volatile ones that suggest capacity constraints.
 
-When we see wild price swings in us-east-1 for c5.large instances, that is not an arbitrage signal. That is a warning. The same pricing data that suggests savings opportunity in stable regions becomes an interruption predictor in volatile ones. The difference lies in how we interpret the statistical distribution.
+## What Is Spot Interruption Risk Detection?
 
-## How We Calculate Volatility for Each Region
+Spot interruption risk detection identifies AWS regions and instance families where price volatility indicates underlying capacity pressure. RefineX calculates the coefficient of variation for each region-instance combination over 24-hour windows. When this metric exceeds 25%, we classify the signal as interruption risk and recommend migrate_spot actions instead of buy_spot recommendations.
 
-Our interruption predictor runs hourly against normalized price data from the last 24 hours. The normalize_prices.py worker first aggregates raw spot prices into hourly buckets, calculating average, minimum, maximum, and standard deviation for each cloud-region-instance_type combination.
+The coefficient of variation measures relative volatility by dividing standard deviation by the mean price. A value of 0.25 means the standard deviation is 25% of the average price. This threshold separates normal market fluctuations from the erratic pricing patterns that precede capacity shortages and interruptions.
 
-The volatility calculation uses coefficient of variation, which is standard deviation divided by mean price. This metric normalizes volatility across different price ranges. A $0.10 standard deviation means different things for a $0.20 instance versus a $2.00 instance. Coefficient of variation accounts for this proportional relationship.
+## How RefineX Calculates Volatility Coefficients
 
-We chose 25% as our volatility threshold after analyzing interruption patterns across AWS regions. Instance families with coefficient of variation below this threshold showed predictable pricing patterns suitable for spot arbitrage. Above 25%, interruption rates increased significantly, making cost optimization secondary to workload migration planning.
+Our interruption predictor runs every hour against normalized pricing data from the previous 24-hour window. The system aggregates raw spot price samples into hourly buckets, calculating average, minimum, maximum, and standard deviation for each cloud-region-instance combination.
 
-## The 25% Threshold Decision
+The volatility calculation uses this normalized data to compute coefficient of variation as standard deviation divided by mean price. When this ratio reaches or exceeds our 0.25 threshold, the detector creates an interruption_risk signal type rather than a spot_arbitrage signal. The evidence field contains the exact volatility coefficient for audit purposes.
 
-The VOLATILITY_THRESHOLD constant in our interruption predictor represents months of signal accuracy analysis. We tested thresholds from 15% to 40% against historical interruption data. Below 20%, we generated too many false positives during normal price fluctuations. Above 30%, we missed early warning signals in regions approaching capacity constraints.
+We chose the 25% threshold through analysis of historical interruption patterns across AWS regions. Regions with coefficients below this level showed stable capacity and predictable interruption rates. Above this threshold, interruption frequency increased significantly, making spot instances less reliable for production workloads.
 
-At 25%, our signals achieve 94% accuracy for predicting elevated interruption risk within the next 6 hours. This threshold catches pricing instability early enough for autoscalers to make migration decisions, but late enough to avoid noise from standard AWS pricing adjustments.
+## Why Volatility Indicates Interruption Risk
 
-The coefficient calculation happens in real-time as new normalized price records arrive. When cv >= VOLATILITY_THRESHOLD evaluates true, we create an interruption_risk signal type instead of our standard spot_arbitrage signal. This changes the recommended action from buy_spot to migrate_spot.
+High price volatility in spot markets typically reflects supply-demand imbalances in the underlying EC2 capacity pools. When AWS capacity tightens in a region, spot prices become erratic as the system tries to balance limited resources against fluctuating demand. This volatility often precedes the capacity exhaustion that triggers spot interruptions.
 
-## What migrate_spot Means for Downstream Systems
+Our system treats these volatile regions differently because the risk profile changes fundamentally. Instead of recommending buy_spot actions that focus on cost savings, we generate migrate_spot signals that prioritize workload continuity. The confidence scoring remains deterministic, but the action guidance shifts to protect against interruption rather than optimize for price.
 
-Unlike buy_spot actions that suggest cost optimization opportunities, migrate_spot signals indicate workload protection requirements. The action tells autoscaling systems to prepare alternative capacity, either in different availability zones or through on-demand instances.
+Current market conditions show 3 active interruption signals with an average confidence of 0.85. Our suppression rate over the past 2 hours stands at 46.1%, indicating conservative signal delivery as designed. The [transparency log](https://www.refinex.io/transparency) contains detailed evidence for each suppression decision.
 
-Our signal model stores the volatility coefficient in the evidence field as {'volatility_coefficient': round(cv, 4)}. Downstream consumers can use this value to calibrate their response. A coefficient of 0.26 suggests mild instability. A coefficient of 0.45 indicates severe volatility requiring immediate attention.
+## How Migrate_Spot Actions Work
 
-The signal TTL for interruption_risk signals defaults to 3600 seconds, giving autoscalers one hour to respond before the signal expires. We update existing signals rather than creating duplicates when volatility persists across multiple detection cycles. This prevents signal spam during extended periods of regional instability.
+When RefineX detects interruption risk, the recommended action becomes migrate_spot rather than buy_spot. This distinction matters for downstream autoscalers and orchestration systems that integrate with our API. The migrate_spot action suggests moving existing workloads to more stable regions or instance families rather than launching new spot capacity in the volatile region.
 
-## Active Monitoring of Volatile Regions
+The signal includes specific evidence showing the volatility coefficient that triggered the classification. This data helps engineering teams understand why a previously stable region now carries interruption warnings. Teams can use this information to adjust their spot strategies before experiencing actual interruptions.
 
-Today we have 12 active interruption signals with an average confidence of 0.85. Our suppression rate over the last 2 hours is 48.7%, meaning we blocked nearly half of potential signals that did not meet our confidence thresholds. This conservative approach prevents false alarms during routine AWS maintenance windows.
+Our deterministic scoring ensures no machine learning models influence these classifications. The coefficient of variation calculation uses pure statistical methods against historical pricing data. This approach maintains the predictable, auditable signal generation that distinguishes RefineX from prediction-based alternatives.
 
-Each interruption signal gets logged to our public transparency log with the detection timestamp, affected region, instance type, and volatility coefficient. The append-only log shows both successful predictions and false positives. We do not suppress or modify historical signal data.
+## Regional Volatility Patterns
 
-The interruption predictor integrates with our broader signal pipeline but operates independently of our arbitrage detection. Both signal types use the same normalized price data but apply different statistical models. Arbitrage signals optimize for cost savings. Interruption signals optimize for workload continuity.
+Different AWS regions exhibit distinct volatility patterns based on capacity utilization and geographic demand. Regions with diverse workload types typically show more stable coefficients, while regions dominated by specific industry segments can experience synchronized demand spikes that drive volatility above our threshold.
 
-Regions experiencing capacity constraints often show coefficient of variation patterns that exceed our threshold 2-4 hours before AWS announces official interruption rate increases. This early warning capability gives infrastructure teams time to migrate workloads proactively rather than reactively.
+Instance family availability also affects volatility patterns. Newer instance types with limited capacity pools show higher volatility coefficients than established families with deeper capacity reserves. Our detector accounts for these differences by calculating coefficients separately for each region-instance combination rather than using regional averages.
+
+The hourly recalculation ensures our system adapts quickly to changing conditions. A region classified as interruption risk can return to normal arbitrage signals once volatility drops below the threshold. This dynamic classification prevents stale risk assessments from persisting beyond their relevance window.
 
 [View the live signal log →](https://www.refinex.io/transparency)
 
