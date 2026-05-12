@@ -1,58 +1,64 @@
 ---
-title: "How We Normalize Spot Prices Before Scoring"
-meta_title: "Spot Price Normalization: How RefineX Buckets Raw AWS Data"
-date: "2026-05-06"
-description: "Raw AWS spot prices contain noise from brief repricing events. RefineX normalizes prices into hourly buckets before scoring to prevent outliers from distorting confidence bands."
-slug: "spot-price-normalization-hourly-buckets"
+title: "How We Normalize AWS Spot Prices Before Scoring"
+meta_title: "Spot Price Normalization: How RefineX Handles Raw AWS Data"
+date: "2026-05-12"
+description: "Raw AWS Spot prices contain noise that distorts confidence scores. RefineX normalizes prices into hourly buckets with mean and standard deviation before deterministic scoring."
+slug: "spot-price-normalization-aws-data-refinex"
 tags: ['aws', 'spot', 'data-engineering', 'confidence-scoring']
 schema:
   type: Article
-  datePublished: "2026-05-06"
+  datePublished: "2026-05-12"
   author: "Keith Brown"
   publisher: "RefineX"
-canonical: "https://www.refinex.io/blog/spot-price-normalization-hourly-buckets"
+canonical: "https://www.refinex.io/blog/spot-price-normalization-aws-data-refinex"
 published: false
 ---
 
-Raw AWS spot prices are noisy by design. A single m5.large instance in us-east-1a might report 17 different prices within one hour due to brief repricing events, capacity adjustments, or availability zone rebalancing. These outlier observations can distort confidence scores if fed directly into our scoring algorithm. This is why RefineX normalizes all raw price data into hourly buckets before any signal calculation begins.
+Raw AWS Spot price data is noisy by design. A single m5.large instance in us-east-1a might report prices every few minutes, but brief repricing events can create outliers that skew confidence calculations. RefineX normalizes all raw price observations into hourly buckets before scoring. This preprocessing step removes noise while preserving the statistical properties we need for deterministic confidence bands.
 
-## What Is Price Normalization for Spot Markets?
+## What Is Price Normalization in Spot Markets?
 
-Price normalization transforms raw spot price observations into statistically stable hourly aggregates. Instead of scoring confidence against individual price points that might represent millisecond-level market anomalies, we calculate mean, standard deviation, min, and max values for each hour bucket. This creates a stable foundation for deterministic confidence scoring across all AWS regions and instance families.
+Price normalization transforms individual spot price observations into statistical summaries over fixed time windows. Instead of scoring against raw prices like $0.0464, $0.0891, $0.0422 collected at random intervals, we aggregate these into hourly buckets containing mean, standard deviation, min, max, and sample count. The confidence scorer then operates on normalized data rather than raw observations.
 
-Our normalization worker runs every hour and processes the previous hour's raw price data. For us-east-1a m5.large, if we collected 23 price observations between 14:00 and 15:00 UTC, the normalizer calculates the average spot price, standard deviation, and sample count for that hour bucket. These normalized values become the input for confidence calculation.
+## Why Raw Prices Distort Confidence Scores
 
-## How RefineX Buckets Raw Price Data
+AWS publishes spot price changes as they occur. An availability zone might see three price updates in one hour and seventeen in the next, depending on supply and demand fluctuations. Our raw price collector captures these observations in the `raw_prices` table with exact timestamps.
 
-The normalize_hourly_prices function groups raw observations by cloud provider, region, and instance type within each hour window. We query all RawPrice records from the previous hour and aggregate them using SQL functions. The normalization runs only once per hour bucket to prevent duplicate processing.
+The problem emerges during confidence calculation. A brief spike to $0.15 for m5.large in us-west-2b, surrounded by stable $0.05 prices, will artificially inflate the volatility component if treated as equivalent to sustained price increases. Single outliers from millisecond-level repricing events carry the same statistical weight as hour-long price levels.
 
-Each normalized record contains six statistical measures: average spot price, minimum price, maximum price, standard deviation, sample count, and the hour bucket timestamp. If we collected 23 observations for m5.large in us-east-1a between 14:00 and 15:00, the sample_count field records 23, and std_dev captures the price variance across those observations.
+We solve this by bucketing raw observations into hour-aligned windows. The normalization worker runs every hour, aggregating the previous hour's raw prices by cloud, region, and instance type. Each bucket produces a `NormalizedPrice` record containing statistical summaries rather than individual observations.
 
-The hour bucket timestamp uses the start of the hour window, not the end. This means prices collected between 14:00 and 15:00 get bucketed with timestamp 14:00. This convention simplifies lookups when the confidence scorer needs 30 days of historical data for a specific instance type and region.
+## How RefineX Normalizes Hourly Buckets
 
-## Why Standard Deviation Matters for Confidence
+Our normalization process runs in `src/workers/process/normalize_prices.py` as an hourly cron job. The worker queries raw prices from the previous completed hour and groups them by instance family and availability zone. For each group, we calculate mean spot price, standard deviation, min, max, and total sample count.
 
-Standard deviation within each hour bucket reveals price volatility patterns that raw prices cannot surface. An hour with 15 price observations ranging from $0.045 to $0.047 indicates stable pricing. An hour with the same 15 observations ranging from $0.032 to $0.089 signals market instability.
+The aggregation query uses PostgreSQL's statistical functions directly. We compute `func.avg(RawPrice.spot_price)` for the hourly mean and `func.stddev(RawPrice.spot_price)` for population standard deviation. Sample count comes from `func.count(RawPrice.id)` to track how many individual price observations contributed to each normalized record.
 
-Our confidence scorer uses this standard deviation as one of five weighted factors. The calculate_confidence function pulls 30 days of normalized price history and computes average standard deviation across all hour buckets. Higher volatility reduces confidence scores, while consistent standard deviation values increase confidence.
+Standard deviation gets special handling since PostgreSQL returns NULL for single-observation groups. The code sets `std_dev_value = float(agg.std_dev or 0.0)` to ensure confidence calculations don't fail on sparse data. A zero standard deviation correctly represents perfect price stability within that hour.
 
-The standard deviation calculation handles edge cases where only one price observation exists in an hour bucket. Our SQL query uses func.stddev which returns None for single observations. The normalization worker converts None values to 0.0 before database insertion, preventing null reference errors during confidence scoring.
+We store normalized data in the `normalized_prices` table with an `hour_bucket` timestamp aligned to hour boundaries. The confidence scorer queries this table instead of raw prices when building 30-day historical profiles for stability calculations.
 
-## From Normalized Data to Confidence Bands
+## How Normalized Data Improves Confidence Scoring
 
-Once normalized prices exist for each hour bucket, the confidence scorer can calculate historical stability across any timeframe. The calculate_confidence function queries 30 days of NormalizedPrice records and evaluates five components: historical stability, market depth, sample size weight, volatility, and interruption rate.
+The confidence scorer in `src/workers/score/confidence_scorer.py` pulls 30 days of normalized prices when evaluating signal reliability. Instead of processing potentially thousands of raw price points, it operates on 720 hourly summaries maximum.
 
-Historical stability measures the percentage of hours where average spot price stayed within 10% of the 30-day average. If m5.large in us-east-1a maintained stable pricing in 650 of 720 hour buckets over 30 days, historical stability scores 0.90. This calculation depends entirely on normalized hourly averages, not raw price noise.
+Historical stability calculation compares each hour's average price against the 30-day mean. Hours where the average stayed within 10% of the historical average count as stable periods. The stability score becomes the percentage of stable hours, ranging from 0.0 to 1.0.
 
-Market depth estimation uses the total number of normalized hour buckets as a proxy for market liquidity. Instance types with 600+ hour buckets over 30 days score 1.0 for market depth. Types with 300-599 buckets score 0.6. This prevents confidence inflation for rarely-used instance types with limited price history.
+Volatility calculation uses the average standard deviation across all hourly buckets, divided by average price to create a coefficient of variation. This metric captures intra-hour price fluctuations while remaining comparable across different absolute price levels.
 
-## Suppression Protects Against Incomplete Normalization
+Sample size weighting factors in the total number of hourly observations available. Confidence scores for instance types with 720 hours of normalized data receive full sample size weight, while newer instance families with limited history get proportional weighting.
 
-Not every instance type and region combination generates sufficient raw price data for reliable normalization. When our collectors find fewer than 10 price observations in an hour bucket, the resulting normalized record carries low statistical confidence. Our suppression system identifies these weak signals and prevents delivery to the API.
+The composite confidence formula combines these normalized components with fixed weights: 30% historical stability, 25% market depth, 20% sample size, 15% volatility, and 10% interruption rate. All inputs derive from normalized hourly data rather than raw observations.
 
-Every suppressed signal gets logged to our public transparency log with the specific reason for suppression. Signals suppressed due to insufficient normalization data help users understand which instance types have limited spot market activity in their target regions. This transparency builds trust in the signals that do pass our confidence threshold.
+## Conservative Defaults for Missing Data
 
-The suppression rate over the past 2 hours stands at 50.0%, meaning half of all potential signals failed to meet our confidence requirements. This conservative approach prevents false signals based on incomplete price normalization. We would rather suppress a questionable signal than deliver one based on insufficient data.
+Instance types without sufficient normalization history default to 0.5 confidence rather than failing score calculation. This conservative approach prevents new AWS instance families from generating high-confidence signals until we accumulate meaningful normalized price history.
+
+The normalization worker includes duplicate detection to prevent reprocessing completed hourly buckets. Each run checks for existing `NormalizedPrice` records matching the target hour before running aggregation queries. This idempotency ensures consistent normalized data even if the worker runs multiple times.
+
+Our current suppression rate of 48.5% over the past two hours reflects this conservative approach. Signals score against normalized data, but confidence thresholds remain high enough to suppress borderline cases. The public [transparency log](https://www.refinex.io/transparency) shows every suppression decision with the calculated confidence score that triggered the suppression.
+
+Normalization creates the foundation for deterministic scoring. Raw prices contain essential market information, but hourly statistical summaries provide the stable input layer our confidence algorithms require. The preprocessing step costs processing time but eliminates noise-driven scoring errors that would reduce signal reliability.
 
 [View the live signal log →](https://www.refinex.io/transparency)
 
