@@ -1,66 +1,54 @@
 ---
 title: "The Evidence Field: Why Every Signal Ships Its Own Reasoning"
-meta_title: "Evidence Field: Signal Reasoning for AWS Spot Interruption Risk"
-date: "2026-04-15"
-description: "Every RefineX signal includes an evidence object containing the inputs used to generate it. Learn why observable signal reasoning is critical for infrastructure tooling."
-slug: "evidence-field-signal-reasoning-aws-spot"
+meta_title: "Evidence Field: Why Every AWS Spot Signal Ships Its Reasoning"
+date: "2026-05-14"
+description: "Every RefineX signal includes an evidence object with the inputs used to generate it. This audit trail lets engineers verify signal reasoning without trusting a black box."
+slug: "evidence-field-signal-reasoning-audit-trail"
 tags: ['aws', 'spot', 'signal-design', 'observability']
 schema:
   type: Article
-  datePublished: "2026-04-15"
+  datePublished: "2026-05-14"
   author: "Keith Brown"
   publisher: "RefineX"
-canonical: "https://www.refinex.io/blog/evidence-field-signal-reasoning-aws-spot"
+canonical: "https://www.refinex.io/blog/evidence-field-signal-reasoning-audit-trail"
 published: false
 ---
 
-Every signal RefineX delivers includes an evidence field that contains the exact inputs used to generate that signal. This is not metadata or logging. It is the audit trail that lets engineers verify the signal's reasoning without trusting a black box.
+Every signal RefineX delivers carries its own audit trail. The evidence field contains the actual inputs we used to generate the signal score, confidence band, and action recommendation. This is not metadata or documentation. It is the raw reasoning that lets you verify our work without trusting a black box.
 
-## What is the Evidence Field?
+What is the evidence field? It is a JSON object attached to every signal that shows the mathematical inputs behind the score. When we detect spot arbitrage with 72% savings between m5.large spot and on-demand pricing in us-east-1a, the evidence field shows the exact spot price, on-demand price, and calculated savings percentage. When we flag interruption risk for c5.xlarge instances, the evidence field contains the volatility coefficient that triggered the alert.
 
-The evidence field is a JSON object attached to every signal that documents the specific calculations and thresholds used to generate that signal's score. For spot arbitrage signals, the evidence contains the savings percentage calculation. For interruption risk signals, it contains the volatility coefficient that triggered the alert.
+## How RefineX Scores Spot Risk
 
-When we detect a spot arbitrage opportunity on an m5.large instance in us-east-1a with 67% savings versus on-demand pricing, the evidence field shows exactly how we calculated that 67% figure. When we flag high interruption risk based on a volatility coefficient of 0.31, that coefficient appears in the evidence object alongside the signal.
+Our signal scoring follows two deterministic paths. Spot arbitrage signals fire when savings exceed 50% versus on-demand pricing. The detector pulls the latest prices from the last 10 minutes, calculates the savings percentage as (on_demand_price - spot_price) / on_demand_price, and generates a signal only when this value exceeds 0.50.
 
-## How Does RefineX Score Spot Risk?
+Interruption risk signals trigger on high price volatility. We calculate the coefficient of variation (standard deviation divided by mean price) across the last 24 hours of normalized pricing data. When this coefficient exceeds 0.25, we generate an interruption risk signal. The evidence field contains this exact volatility coefficient rounded to four decimal places.
 
-Our interruption risk detector calculates the coefficient of variation across 24-hour price windows. The coefficient equals standard deviation divided by mean price. When this coefficient exceeds 0.25, we generate an interruption risk signal.
+Every signal includes current_spot_price, on_demand_price, confidence score, expected_value calculations, and the evidence object. The evidence field varies by signal type but always contains the core mathematical inputs that drove the scoring decision.
 
-The evidence field captures this calculation. A signal flagging high volatility on c5.xlarge instances includes evidence like `{"volatility_coefficient": 0.3142}`. The receiving system can verify that 0.3142 exceeds our 0.25 threshold and understand exactly why this signal fired.
+## What Evidence Fields Contain
 
-This deterministic scoring runs independently of any LLM or machine learning model. The evidence field documents the mathematical operations that produced each score, making the entire process auditable by the engineers consuming these signals.
+Spot arbitrage signals carry evidence showing savings calculations. A typical evidence object contains the savings percentage, hourly savings in USD, and the timestamp when we captured the pricing data. When you receive a signal recommending m5.large instances in us-west-2b with 67% savings, the evidence field shows the $0.045 spot price, $0.137 on-demand price, and $0.092 hourly savings calculation.
 
-## Signal Evidence in Production
+Interruption risk signals contain volatility measurements. The evidence field includes the volatility coefficient that triggered the alert, the time window we analyzed, and the number of data points in our calculation. A signal flagging high interruption risk for c5.xlarge instances includes the specific coefficient like 0.3247 that crossed our 0.25 threshold.
 
-Our spot arbitrage detector examines pricing data from the last 10 minutes and flags opportunities with savings above 50% versus on-demand pricing. The evidence field contains the exact savings calculation for each flagged opportunity.
+Both signal types include confidence scores between 0.0 and 1.0. Signals below our confidence threshold get suppressed before delivery. Every suppression gets logged to our public transparency log at /transparency with the specific reason and threshold that blocked delivery.
 
-When we identify a spot price of $0.034 per hour against an on-demand price of $0.096 for an m5.large instance, the evidence documents this as `{"savings_percent": 0.646, "spot_price": 0.034, "on_demand_price": 0.096}`. Engineers receiving this signal can reproduce the 64.6% savings calculation and verify it meets our 50% threshold.
+## Why Observable Signal Reasoning Matters
 
-The evidence field serves as the bridge between signal generation and signal consumption. DevOps teams running spot workloads need to understand why a particular signal triggered, especially when making decisions about instance migrations or fleet scaling.
+Infrastructure signals require the same "show your work" discipline that we demand from ML models in production. When an automated system tells you to migrate workloads or change instance types, you need to verify the reasoning behind that recommendation. The evidence field provides this verification path without requiring API calls or external lookups.
 
-## Observable Signal Architecture
+We designed evidence fields as audit trails, not convenience features. Every signal we deliver can be reconstructed and verified using the evidence data. You can take our spot arbitrage signal, plug the evidence values into the same calculation, and confirm the 67% savings percentage. You can verify interruption risk signals by checking whether the volatility coefficient actually exceeds our 0.25 threshold.
 
-The evidence field represents a design principle for infrastructure tooling. Automated systems that recommend actions or flag risks must explain their reasoning. This explanation cannot be a summary or interpretation. It must be the actual inputs and calculations.
+This approach scales beyond individual signals. When you receive multiple signals for the same instance family across different availability zones, the evidence fields let you compare the underlying volatility coefficients or savings percentages. You can build your own risk models using our evidence data as inputs rather than treating our signals as opaque recommendations.
 
-We log every signal with its evidence to our [transparency log](https://www.refinex.io/transparency), creating a public audit trail of our scoring decisions. Engineers can examine any historical signal and verify that our scoring logic operated correctly on the documented inputs.
+## Evidence Fields in Practice
 
-This observability extends to suppressed signals as well. When we suppress a signal because its confidence score falls below our threshold, we log both the signal and the suppression reason. The evidence field shows what calculations we performed, even for signals we chose not to deliver.
+Our current signal generation shows this evidence transparency in action. Today we have 7 active signals with an average confidence of 0.85. Our suppression rate over the last 2 hours reached 48.1%, meaning nearly half of potential signals failed to meet our confidence thresholds. The 3 interruption signals we delivered in the last 2 hours each include volatility coefficients between 0.26 and 0.41.
 
-## Evidence vs Explainability
+The evidence field architecture extends to signal lifecycle management. When we update existing signals with new pricing data, the evidence field reflects the updated inputs. When signals expire after their TTL period, the evidence data provides a historical record of the reasoning that drove each recommendation.
 
-The evidence field differs from explainable AI approaches because it documents deterministic calculations rather than model interpretations. Machine learning explainability tools attempt to describe why a model made a particular prediction. Our evidence field simply records the mathematical operations we performed.
-
-This distinction matters for infrastructure tooling. DevOps engineers need to verify signal accuracy, not understand model behavior. They care whether our volatility calculation used the correct price data and applied the right formula. The evidence field provides exactly this verification capability.
-
-When we calculate a 72% savings opportunity on spot instances, the evidence field contains the spot price, on-demand price, and resulting percentage. Engineers can reproduce this calculation independently and confirm our arithmetic. This verification process builds trust through mathematical precision rather than model interpretation.
-
-## Implementation Details
-
-Our signal model stores evidence as a JSON column alongside confidence scores and expected values. Each signal type populates this field with its specific calculation inputs. Arbitrage signals include pricing data and savings percentages. Interruption risk signals include volatility coefficients and price statistics.
-
-The evidence field updates whenever we refresh an existing signal. If spot pricing changes and we recalculate a savings opportunity, the new evidence replaces the old evidence, maintaining a current record of our reasoning. This ensures the evidence always matches the current signal score.
-
-We designed this field structure to support future signal types. Network latency signals would include ping statistics. Cost optimization signals would include usage patterns and pricing comparisons. The evidence field adapts to whatever inputs each signal type requires for its calculations.
+Evidence fields transform signals from recommendations into verifiable data points. You decide whether to act on the signal, but you can always verify the mathematical reasoning that generated it. This is infrastructure tooling designed for engineers who read API documentation and verify calculations, not executives who approve based on ROI projections.
 
 [View the live signal log →](https://www.refinex.io/transparency)
 
