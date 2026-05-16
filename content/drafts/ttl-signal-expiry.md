@@ -1,58 +1,60 @@
 ---
 title: "Why Every Spot Signal Has an Expiry Date"
-meta_title: "Spot Signal TTL: Why AWS Pricing Signals Expire"
-date: "2026-05-12"
-description: "RefineX spot signals expire within minutes using TTL to prevent stale pricing data from reaching production workloads."
-slug: "spot-signal-ttl-expiry-aws-pricing"
+meta_title: "Spot Signal TTL System: Why AWS Recommendations Expire"
+date: "2026-05-16"
+description: "AWS Spot signals built on stale pricing data become historical trivia. RefineX TTL system ensures every delivered signal reflects current market conditions."
+slug: "spot-signal-ttl-expiry-system"
 tags: ['aws', 'spot', 'signal-design']
 schema:
   type: Article
-  datePublished: "2026-05-12"
+  datePublished: "2026-05-16"
   author: "Keith Brown"
   publisher: "RefineX"
-canonical: "https://www.refinex.io/blog/spot-signal-ttl-expiry-aws-pricing"
+canonical: "https://www.refinex.io/blog/spot-signal-ttl-expiry-system"
 published: false
 ---
 
-## What Is Signal TTL in AWS Spot Markets?
+A spot recommendation built on 15-minute-old pricing data is not advice. It is historical trivia. When AWS Spot prices shift, any signal derived from previous market conditions becomes worse than useless because it suggests actions based on conditions that no longer exist.
 
-Every RefineX signal carries an expiration timestamp. When that moment arrives, the signal dies regardless of how attractive the underlying cost savings appear. This time-to-live system prevents stale pricing data from reaching your production workloads. A spot recommendation built on 15-minute-old data is not advice. It is historical trivia.
+Every RefineX signal carries a TTL that determines when it expires. This is not a convenience feature. It is the core mechanism that prevents stale recommendations from reaching production systems where they could trigger costly mistakes.
 
-AWS Spot prices change every few minutes across hundreds of availability zones. When us-east-1a reprices m5.large instances from $0.045 to $0.089 per hour, any signal based on the old price becomes dangerous to act upon. Our TTL system ensures delivered signals reflect current market conditions rather than yesterday's bargains.
+## What Is Signal TTL in Spot Markets
 
-## How RefineX Implements Signal Expiration
+Signal TTL defines how long a spot market recommendation remains valid before it must be discarded. Unlike web caching where stale data might slow a page load, stale spot signals can trigger instance launches at prices that no longer exist or suggest availability in zones where capacity has vanished.
 
-The expiration system runs as a background scheduler that checks signal validity every minute. Each signal in our database carries three temporal markers: creation timestamp, TTL duration in seconds, and calculated expiry time. When the scheduler runs, it marks expired signals as inactive and logs the suppression count.
+Our TTL system runs on a one-minute scheduler that marks signals as inactive when their expiration timestamp passes. The expire_old_signals function queries all active signals, compares their expires_at timestamp to the current time, and deactivates any that have exceeded their lifespan. We suppressed 48.2% of potential signals in the past two hours because their underlying data had aged beyond reliability thresholds.
 
-Our expire_old_signals function queries the database for signals where the current time exceeds the expires_at timestamp. The system processes these expiries in batches, updating the is_active flag to false for each expired record. This approach means a signal scoring 0.89 confidence with 47% cost savings gets suppressed the moment its TTL expires.
+## How Signal Expiration Prevents Bad Recommendations
 
-The scheduler itself operates on a simple interval trigger firing every 60 seconds. This frequency balances freshness requirements with database load. During high volatility periods, when AWS reprices aggressively, we see TTL expiry rates spike above normal background levels as market conditions invalidate signals faster than usual.
+The Signal model stores both ttl seconds and an explicit expires_at timestamp. This dual approach prevents edge cases where clock drift or processing delays might keep expired signals active. When a signal ages out, the is_active flag switches to false, which immediately removes it from all API responses.
 
-## The Cost of Stale Signal Delivery
+Expired signals never reach customers. The public signals endpoint shows both delivered and suppressed signals for transparency, but the authenticated API that customers use filters out anything with is_active set to false. This creates a hard boundary between current intelligence and historical data.
 
-Consider a signal recommending m5.xlarge instances in us-west-2b at $0.083 per hour when on-demand costs $0.192. The spread suggests 56% savings with high confidence. But if AWS repriced Spot to $0.156 five minutes after signal generation, acting on that stale recommendation means paying 88% more than expected while believing you are saving money.
+Consider a signal recommending m5.large instances in us-east-1a based on a 40% savings versus on-demand. If that signal was generated when spot prices were $0.048 per hour but the current price has jumped to $0.089, acting on the expired signal would result in minimal savings or even losses compared to on-demand pricing.
 
-This scenario drives our conservative TTL defaults. Most RefineX signals carry 5-minute expiry windows. For volatile instance families during peak demand periods, we reduce TTL to 2 minutes. The tradeoff is clear: shorter signal lifespans mean higher suppression rates but eliminate the risk of acting on obsolete market data.
+## TTL Values Reflect Market Volatility
 
-The public transparency log at our [transparency page](https://www.refinex.io/transparency) shows this discipline in action. Recent suppression rates average 47.2% over two-hour windows. Nearly half of generated signals never reach delivery because they fail freshness requirements. This is not a bug in our system. This is the system working correctly.
+Different signal types carry different TTL values because market conditions change at different rates. Spot arbitrage signals that depend on precise pricing differentials typically expire within 5-10 minutes. Interruption risk signals based on capacity trends might remain valid for 30-60 minutes since underlying capacity changes more slowly than pricing.
 
-## Why TTL Matters More Than Confidence Scores
+The TTL field in our signal model stores the initial lifespan in seconds, while expires_at captures the exact moment when the signal becomes invalid. Our scheduler checks every minute rather than every second because spot market changes operate on minute-scale intervals, not second-scale precision.
 
-A signal with 0.95 confidence based on 20-minute-old pricing data ranks as less valuable than a 0.65 confidence signal generated 30 seconds ago. Confidence measures our certainty about the analysis. TTL measures the relevance of the underlying market data. Both must pass thresholds for delivery.
+Current market conditions show 3 active signals with an average confidence of 0.85. These represent opportunities that passed both freshness and confidence thresholds. The signals that expired over the past hour were not necessarily wrong when generated, but they became unreliable as market conditions shifted.
 
-Our signal scoring pipeline generates confidence bands using deterministic algorithms analyzing historical interruption patterns, regional capacity indicators, and pricing volatility measures. But even perfect analysis becomes worthless when applied to stale inputs. The TTL system acts as a final gate ensuring temporal relevance regardless of analytical precision.
+## Suppression Logs Track Expiry Reasons
 
-When signals approach expiry, we do not extend their lifespans or refresh them automatically. Each signal represents a specific market snapshot at a particular moment. Extending expiry times would blur the temporal precision that makes signals actionable. Instead, expired signals trigger new analysis cycles that generate fresh signals reflecting current conditions.
+Every expired signal appears in our public [transparency log](https://www.refinex.io/transparency) with a suppression reason. The public signals endpoint derives these reasons from signal metadata since we log the decision but not always the specific trigger. Signals suppressed for stale_data had expires_at timestamps that passed before delivery, while ttl_expired indicates the signal aged out during processing.
 
-## Signal Lifecycle in Production
+This creates an audit trail showing not just what signals we delivered, but what signals we blocked and why. When market repricing events cause TTL expiry rates to spike, the suppression log reflects the increased volatility as more signals age out faster than normal.
 
-The complete signal lifecycle spans generation, validation, delivery, and expiry phases. During generation, our workers collect current spot prices, interruption data, and capacity signals from AWS APIs. Validation applies confidence thresholds and TTL calculations. Delivery pushes qualifying signals to API endpoints, Slack channels, and email notifications.
+The transparency extends to our internal operations. The expire_signals scheduler logs every expiration run with the count of signals marked inactive. This creates visibility into both normal operations and unusual conditions where large numbers of signals expire simultaneously due to market disruptions.
 
-Expiry represents the final phase where signals transition from active to historical status. The background scheduler marks expired signals inactive but preserves the records for audit purposes. This creates an append-only log showing both delivered recommendations and suppressed signals with timestamps and reasons.
+## Signal Freshness Over Signal Volume
 
-Current production metrics show 2 active signals with average confidence of 0.85. The expiry scheduler processed 6 interruption signals in the past two hours with suppression rates holding steady at 47.2%. These numbers reflect normal market conditions where roughly half of generated signals meet delivery criteria while the remainder get suppressed for various reasons including TTL expiry.
+We could extend TTL values to keep more signals active longer, which would increase delivery volume and appear more responsive to customers. We choose shorter TTL windows instead because fresh signals with limited scope provide more value than comprehensive signals with questionable accuracy.
 
-The TTL system ensures that when you receive a RefineX signal, the underlying market data driving that recommendation reflects current AWS pricing rather than historical snapshots. This temporal discipline transforms signals from interesting observations into actionable intelligence for production workloads.
+This design reflects a core principle: discipline in signal management creates trust in signal quality. Every minute our scheduler runs, it evaluates every active signal against current time and deactivates any that have aged beyond reliability. The suppression count often exceeds the delivery count, and this ratio indicates the system is working correctly.
+
+The alternative would be delivering signals regardless of age, which would inflate our delivery metrics while degrading recommendation quality. Better to suppress a signal that might still be useful than deliver one that might be misleading.
 
 [View the live signal log →](https://www.refinex.io/transparency)
 
