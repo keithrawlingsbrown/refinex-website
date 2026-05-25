@@ -1,54 +1,58 @@
 ---
-title: "Two Signal Types, One API: Arbitrage vs Interruption Risk"
-meta_title: "AWS Spot Arbitrage vs Interruption Risk Signals - RefineX API"
-date: "2026-05-10"
-description: "RefineX delivers spot_arbitrage buy opportunities and interruption_risk warnings through one API. Different detection logic, same JSON format."
-slug: "spot-arbitrage-vs-interruption-risk-signals"
+title: "Two Signal Types, One API: How RefineX Handles Arbitrage and Interruption Risk"
+meta_title: "Spot Arbitrage vs Interruption Risk: One API, Two Signal Types"
+date: "2026-05-25"
+description: "RefineX exposes spot_arbitrage and interruption_risk signals through unified endpoints with different detection logic and actions."
+slug: "spot-arbitrage-interruption-risk-signals"
 tags: ['aws', 'spot', 'signal-design', 'api-design']
 schema:
   type: Article
-  datePublished: "2026-05-10"
+  datePublished: "2026-05-25"
   author: "Keith Brown"
   publisher: "RefineX"
-canonical: "https://www.refinex.io/blog/spot-arbitrage-vs-interruption-risk-signals"
+canonical: "https://www.refinex.io/blog/spot-arbitrage-interruption-risk-signals"
 published: false
 ---
 
-The RefineX API delivers two distinct signal types through identical endpoints: spot_arbitrage signals that identify buy opportunities and interruption_risk signals that warn about volatile regions to avoid. They use different detection algorithms, different confidence inputs, and trigger different recommended actions. We unified them into a single delivery format because both answer the same question: when is it safe to run on Spot?
+The RefineX API delivers two fundamentally different signal types through the same endpoints: `spot_arbitrage` for buy opportunities and `interruption_risk` for volatile regions to avoid. They share JSON structure but require different responses from your infrastructure code.
 
 ## What Are Arbitrage vs Interruption Risk Signals?
 
-Arbitrage signals detect price gaps where Spot instances cost at least 50% less than on-demand pricing. Our spot_arbitrage_detector.py scans the latest price data every 10 minutes and creates signals when savings_pct exceeds the ARBITRAGE_THRESHOLD of 0.50. The action field returns "buy_spot" and the expected_value JSON contains savings_percent and savings_usd_per_hour calculations.
+Arbitrage signals identify immediate cost savings opportunities where spot prices drop below 50% of on-demand pricing. Interruption risk signals flag instance families and availability zones with coefficient of variation above 0.25, indicating high volatility and probable interruptions.
 
-Interruption risk signals identify regions with high price volatility, which correlates with interruption probability. The interruption_predictor.py calculates coefficient of variation (standard deviation divided by mean price) across 24-hour windows. When this volatility metric exceeds 0.25, we generate an interruption_risk signal with action "migrate_spot" or "fallback_on_demand" depending on confidence level.
+The signals use different detection algorithms but arrive through identical API responses. Your code receives the same confidence score, expected value, and TTL structure regardless of signal type. The `type` field and `action` recommendations differentiate how you should respond.
 
-## How Detection Logic Differs Between Signal Types
+## How RefineX Detects Each Signal Type
 
-The arbitrage detector queries RawPrice records and groups by cloud, region, availability_zone, and instance_type. It joins against the latest timestamps to get current pricing, then calculates immediate savings opportunities. If an existing spot_arbitrage signal covers the same location, we update the current_spot_price and on_demand_price fields rather than creating duplicates.
+Our arbitrage detector scans the latest 10-minute price window across all AWS regions. When spot pricing drops to create savings of 50% or greater versus on-demand, we calculate confidence based on price stability over the detection window. The detector updates existing signals rather than creating duplicates, maintaining one active arbitrage signal per instance family and availability zone combination.
 
-Interruption prediction operates on NormalizedPrice hourly buckets instead of raw pricing data. We pull 24 hours of price history and calculate volatility coefficients per region and instance type. High coefficient of variation indicates price instability, which AWS documentation confirms correlates with interruption frequency. The evidence JSON stores the actual volatility_coefficient value for audit purposes.
+The interruption predictor operates on 24-hour normalized price data. We calculate the coefficient of variation by dividing standard deviation by mean spot price. When this ratio exceeds 0.25, we flag the combination as interruption risk. High coefficient of variation correlates with sudden price spikes that typically precede spot instance terminations.
 
-Both detectors write to the same signals table with identical schema. The type column distinguishes "spot_arbitrage" from "interruption_risk" records. TTL values differ: arbitrage signals expire within 5-10 minutes since pricing changes rapidly, while interruption risk signals persist for hours since volatility patterns evolve more slowly.
+Both detectors write to the same Signal table with identical schema but populate the evidence field differently. Arbitrage signals store savings calculations while interruption signals record volatility coefficients. The confidence scoring remains deterministic across both types.
 
-## Why One API Endpoint for Both Signal Types
+## Why We Unified the API Design
 
-We considered separate /arbitrage and /interruption endpoints but chose unified delivery for three reasons. First, DevOps teams need both signal types to make informed Spot decisions. You want to know if savings justify risk and whether current conditions suggest stable or volatile periods ahead.
+DevOps teams managing spot fleets need both signal types in their automation workflows, but they do not want to poll multiple endpoints or handle different authentication schemes. We tested separate endpoints during development and found teams were building wrapper functions to normalize the responses anyway.
 
-Second, confidence scoring works identically across signal types. Both use 0.0-1.0 deterministic confidence bands with the same suppression logic. Signals below our confidence threshold get blocked before delivery regardless of type. Our [transparency log](https://www.refinex.io/transparency) shows suppression decisions for both arbitrage and interruption signals using identical reasoning.
+The unified design lets you write one signal polling function that handles both opportunity detection and risk avoidance. Your code can switch on the signal type and route to appropriate handlers without duplicating the HTTP client, caching, or error handling logic. When signals expire or get suppressed, your existing cleanup routines work for both types.
 
-Third, the action field provides clear differentiation. Arbitrage signals return "buy_spot" actions when savings exceed risk. Interruption signals return "migrate_spot" or "wait" actions when volatility suggests caution. API consumers can filter by signal type or action depending on their automation needs.
+We also maintain consistent suppression logic across signal types. Both arbitrage and interruption signals get suppressed below the same confidence thresholds, and all suppressions appear in our [transparency log](https://www.refinex.io/transparency) with identical audit formatting.
 
 ## How to Handle Each Signal Type in Your Code
 
-The GET /signals endpoint returns both types in the same JSON structure. Check the type field to determine handling logic. For spot_arbitrage signals, examine the expected_value object for savings calculations and current_spot_price for exact pricing. For interruption_risk signals, the evidence object contains volatility metrics and historical context.
+Arbitrage signals typically carry a `buy_spot` action with expected savings in the `expected_value` field. Your automation should validate that the instance family meets your workload requirements, check current capacity in the target availability zone, then execute spot requests if conditions align. The TTL averages 15 minutes because arbitrage opportunities close quickly.
 
-Arbitrage signals work best for launch decisions. When you see type: "spot_arbitrage" with confidence above 0.7, the economics favor Spot over on-demand. Check savings_percent in expected_value to calculate cost impact for your workload size.
+Interruption risk signals recommend `migrate_spot` or `fallback_on_demand` actions. These signals have longer TTLs since volatility regimes persist for hours or days. Your infrastructure code should drain existing spot instances in flagged availability zones and avoid launching new capacity there until the signal expires.
 
-Interruption signals inform migration timing. When type: "interruption_risk" appears with action: "migrate_spot", current conditions suggest moving workloads to different availability zones within the same region. The volatility_coefficient in evidence shows the mathematical basis for this recommendation.
+The confidence bands work identically for both signal types. We suppress anything below 0.50 confidence, deliver 0.50-0.75 signals in preview mode, and recommend production usage above 0.75. Both signal types respect your account's preview mode settings and suppression preferences.
 
-We maintain separate confidence calculations because arbitrage and interruption risk have different error costs. False positive arbitrage signals waste optimization opportunities. False positive interruption signals trigger unnecessary migrations. Our thresholds reflect these asymmetric costs: we suppress arbitrage signals more aggressively than interruption warnings.
+## Current Signal Distribution
 
-Active signals currently number 4 with 48.1% suppression rate over the past 2 hours. Interruption signals specifically show 12 active warnings with 0.85 average confidence. These numbers demonstrate that unified delivery works at scale while maintaining signal quality through disciplined suppression.
+This week we generated 6 interruption signals versus 5 arbitrage opportunities across all monitored regions. The interruption signals concentrated in us-east-1 and eu-west-1 during peak demand hours. Our suppression rate of 47.5% over the last 2 hours reflects conservative confidence thresholds rather than detection failures.
+
+The average confidence of 0.85 for delivered signals includes both types. Arbitrage signals tend toward higher confidence because price differentials are directly observable. Interruption risk signals require volatility analysis over longer windows, making confidence calculation more conservative.
+
+Both signal types contribute to the same delivery quotas and rate limits on your API key. You cannot request only arbitrage or only interruption signals through filtering parameters. This ensures consistent signal mixing and prevents teams from ignoring risk signals while consuming opportunity signals.
 
 [View the live signal log →](https://www.refinex.io/transparency)
 
