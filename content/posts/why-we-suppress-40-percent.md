@@ -46,9 +46,11 @@ A suppression rate near zero means the system fires on everything. That is not p
 
 A suppression rate above 80% during a compressed market period means the engine detected conditions, evaluated them against four quality gates, and made a deliberate choice not to act. That is the behavior you want from infrastructure tooling.
 
-The signal log is public. The suppression reasons are logged. You can verify the behavior yourself.
+When RefineX is running, the signal log is public and suppression reasons are logged, so the behavior can be verified directly.
 
-[View the live signal log →](https://www.refinex.io/transparency)
+> **Update (2026-09-06):** RefineX is not currently offered publicly, at any tier. The signal log referenced above is not currently showing live data.
+
+[Signal engine reference →](https://www.refinex.io/transparency)
 
 ---
 *Keith Brown*

@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   icons: { icon: '/favicon.svg' },
   openGraph: {
     title: 'RefineX — Cloud signal intelligence for your infrastructure',
-    description: 'Confidence-scored spot market signals with regime context. Delivered via API, MCP, CLI, and real-time dashboard. Advisory-only.',
+    description: 'Confidence-scored spot market signals with regime context. Advisory-only. Not currently offered publicly.',
     type: 'website',
     siteName: 'RefineX',
     url: 'https://refinex.io',

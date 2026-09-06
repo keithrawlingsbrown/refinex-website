@@ -48,9 +48,11 @@ Our normalization process aggregates raw pricing data into hourly buckets, calcu
 
 Interruption risk signals undergo the same confidence scoring and suppression logic as arbitrage signals. Low-confidence interruption signals get suppressed and logged to our public audit trail rather than delivered to operators. This prevents alert fatigue from marginal volatility patterns that fall near the threshold boundary.
 
-The suppression system currently blocks 47.1% of interruption risk signals before delivery, with suppressed signals logged with specific reasons at our [transparency log](https://www.refinex.io/transparency). Common suppression reasons include insufficient sample count in the normalized price data and volatility coefficients that fall within statistical noise ranges.
+At the time of writing, the suppression system blocked 47.1% of interruption risk signals before delivery, with suppressed signals logged with specific reasons to a transparency log. Common suppression reasons include insufficient sample count in the normalized price data and volatility coefficients that fall within statistical noise ranges.
 
 Active interruption risk signals expire based on their configured TTL values, typically 4 hours for capacity-based signals. As volatility returns to normal ranges in subsequent detection cycles, the signal classification reverts from interruption_risk back to standard arbitrage evaluation.
+
+> **Update (2026-09-06):** RefineX is not currently offered publicly, at any tier. The transparency log referenced above is not currently showing live data.
 
 ## Downstream Autoscaler Response
 
@@ -60,7 +62,7 @@ The signal includes current_spot_price and confidence scores to help autoscalers
 
 RefineX delivers these signals as JSON via API, with additional delivery channels through Slack and email for operations teams managing multiple AWS accounts. Each signal carries a unique signal_id for tracking and correlation with subsequent interruption events or capacity recovery patterns.
 
-[View the live signal log →](https://www.refinex.io/transparency)
+[Signal engine reference →](https://www.refinex.io/transparency)
 
 ---
 *Keith Brown*

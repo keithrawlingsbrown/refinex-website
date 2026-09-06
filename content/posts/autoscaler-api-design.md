@@ -50,11 +50,13 @@ Our signals table stores each recommendation with a TTL value and `expires_at` t
 
 The confidence scoring happens in our deterministic pipeline, which analyzes current spot pricing from AWS APIs, historical interruption patterns, and on-demand price comparisons. Every signal includes an `expected_value` JSON field with calculations like `savings_percent` and `savings_usd_per_hour` that inform the confidence score.
 
-We track every suppressed signal in our public transparency log at [https://www.refinex.io/transparency](https://www.refinex.io/transparency), which shows both delivered and blocked recommendations. This audit trail lets you verify that our single-action approach actually delivers the highest-confidence opportunities rather than arbitrary selections.
+When RefineX is running, every suppressed signal is tracked in a public transparency log, showing both delivered and blocked recommendations — an audit trail meant to let you verify that the single-action approach actually delivers the highest-confidence opportunities rather than arbitrary selections.
 
-The current market state shows 50 active signals with an average confidence of 0.85, which means our single-action endpoint has high-quality options to choose from. When market conditions deteriorate and confidence scores drop, the fallback parameter ensures your infrastructure gets clear guidance about alternative actions.
+At the time of writing, the market state showed 50 active signals with an average confidence of 0.85. When market conditions deteriorate and confidence scores drop, the fallback parameter ensures your infrastructure gets clear guidance about alternative actions.
 
-[View the live signal log →](https://www.refinex.io/transparency)
+> **Update (2026-09-06):** RefineX is not currently offered publicly, at any tier. The transparency log referenced above is not currently showing live data.
+
+[Signal engine reference →](https://www.refinex.io/transparency)
 
 ---
 *Keith Brown*

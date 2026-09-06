@@ -38,7 +38,9 @@ Risk signals set the action field to `migrate_spot` or `fallback_on_demand` depe
 
 Both signal types use the same database schema in `models/signal.py`. The type column distinguishes between `spot_arbitrage` and `interruption_risk`, but they share the same confidence, expected_value, evidence, and expiration fields. This design lets us add new signal types without changing client integration patterns.
 
-The `/signals/active` endpoint returns both types in the same JSON array. Callers filter by the type field to separate buy opportunities from risk warnings. The public transparency endpoint at `/signals/public` shows both delivered and suppressed signals across both types, creating a complete audit trail that you can verify at our [transparency log](https://www.refinex.io/transparency).
+The `/signals/active` endpoint returns both types in the same JSON array. Callers filter by the type field to separate buy opportunities from risk warnings. When RefineX is running, the public transparency endpoint at `/signals/public` shows both delivered and suppressed signals across both types as a complete audit trail.
+
+> **Update (2026-09-06):** RefineX is not currently offered publicly, at any tier. The endpoints and transparency log referenced above are not currently functional.
 
 ## Different Actions for Different Signals
 
@@ -54,7 +56,7 @@ The current system processes 1 active signal with a 48.4% suppression rate over 
 
 The tradeoff is slightly more complex client code to handle different action types, but most users already filter signals by region or instance family, so adding a type filter costs little additional complexity.
 
-[View the live signal log →](https://www.refinex.io/transparency)
+[Signal engine reference →](https://www.refinex.io/transparency)
 
 ---
 *Keith Brown*

@@ -68,7 +68,7 @@ This is an engineering tradeoff. A trained ML model might produce better accurac
 
 The scoring logic is embedded in the codebase. The inputs are logged with every score. The suppression log is public. If you disagree with the weight distribution, the math is in front of you.
 
-[View the live signal log →](https://www.refinex.io/transparency)
+[Signal engine reference →](https://www.refinex.io/transparency)
 
 ---
 *Keith Brown*

@@ -56,7 +56,9 @@ The suppressed signals include instances like c6i.xlarge in us-east-2 with MEDIU
 
 An autoscaler acting on a stale spot signal does not just miss a saving. It can trigger a migration into a market about to reprice, generating an interruption that costs more than the spread it was chasing. That failure mode is worse than not acting. The suppression gate exists because of that failure mode.
 
-The transparency page logs all of this: the region, the instance type, the confidence band, the savings estimate, the suppression flag, and the reason. You can verify the engine's decision-making directly — signal by signal.
+When RefineX is running, the transparency page logs all of this: the region, the instance type, the confidence band, the savings estimate, the suppression flag, and the reason — meant to let the engine's decision-making be verified directly, signal by signal.
+
+> **Update (2026-09-06):** RefineX is not currently offered publicly, at any tier. The transparency page referenced above is not currently showing live data.
 
 ## The asymmetry that matters
 
@@ -66,7 +68,7 @@ AWS's five buckets do not tell you when the model's confidence in its own histor
 
 That asymmetry is the design. Overfiring destroys trust faster than underfiring. One bad signal and engineers disable the integration. The suppression rate is not a metric to minimize — it is evidence of discipline.
 
-[View the live signal log →](https://www.refinex.io/transparency)
+[Signal engine reference →](https://www.refinex.io/transparency)
 
 ---
 *Keith Brown*

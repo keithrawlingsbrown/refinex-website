@@ -44,13 +44,12 @@ We partition older signals by week to maintain consistent performance as data vo
 
 ## The Suppression Log as a Trust Surface
 
-Our [transparency page](https://www.refinex.io/transparency) publishes what we suppressed and why — not just what we delivered. Of the 175 signals suppressed in the last six hours alone, each has a logged suppression reason: confidence below threshold, TTL expired, or duplicate within the clustering window.
+When RefineX is running, the [transparency page](https://www.refinex.io/transparency) publishes what was suppressed and why — not just what was delivered, with a logged suppression reason for each: confidence below threshold, TTL expired, or duplicate within the clustering window.
 
 This is deliberate. Overfiring destroys trust faster than underfiring. A signal that fires every time the price ticks below on-demand is not a signal — it is noise. Deduplication is what makes the delivered signal meaningful.
 
-The no-auth endpoint at [refinex.io/live](https://www.refinex.io/live) shows the current best signal in real time, including the suppressed_last_6h count. That number is the product.
-
-[View the live signal log →](https://www.refinex.io/transparency)
+> **Update (2026-09-06):** RefineX is not currently offered publicly, at any tier.
+> The no-auth `/live` endpoint referenced above is not currently functional.
 
 ---
 *Keith Brown*

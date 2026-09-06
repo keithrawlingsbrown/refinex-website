@@ -14,6 +14,11 @@ canonical: "https://www.refinex.io/blog/refinex-mcp-cli-developer-tools"
 published: true
 ---
 
+> **Update (2026-09-06):** RefineX is not currently offered publicly, at any tier.
+> The no-auth endpoints, curl examples, and "Early Access" links described below
+> are not currently functional. This post is preserved as a historical record of
+> what shipped on 2026-03-28.
+
 Two things shipped today:
 
 ```bash

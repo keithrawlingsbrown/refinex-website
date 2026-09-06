@@ -134,9 +134,9 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               </svg>
             </div>
             <div>
-              <p className="text-white font-semibold text-base mb-1">See this analysis live</p>
+              <p className="text-white font-semibold text-base mb-1">About this analysis</p>
               <p className="text-slate-400 text-sm leading-relaxed">
-                The data behind this post comes from the RefineX signal engine — running in real time, logging every signal it generates and every one it suppresses. Free to inspect, no account required.
+                This post describes the RefineX signal engine. RefineX is not currently offered publicly, at any tier.
               </p>
             </div>
           </div>
@@ -150,7 +150,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
               </svg>
-              View live signal log
+              Signal engine reference
             </Link>
 
             <Link href="/docs"

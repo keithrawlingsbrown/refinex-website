@@ -46,11 +46,13 @@ The expiration worker itself runs in isolation from the main signal generation p
 
 Today we show 0 active signals with a 50% suppression rate over the past 2 hours. Of the 8 interruption signals we generated, none survived the confidence and TTL filters to reach delivery. This pattern reflects conservative signal discipline during a quiet market period where most potential signals failed our freshness or confidence thresholds.
 
-You can track these patterns in real-time through our transparency log, which shows every signal we generate alongside its suppression status and reasoning. The append-only nature of this log means you can audit our expiration decisions and verify that TTL enforcement happens as documented.
+When RefineX is running, these patterns are tracked through an append-only transparency log, showing every signal generated alongside its suppression status and reasoning.
+
+> **Update (2026-09-06):** RefineX is not currently offered publicly, at any tier. The transparency log referenced above is not currently showing live data.
 
 Signal TTL represents the discipline that separates actionable intelligence from market commentary. We kill signals not because they are wrong, but because they are old. In spot markets, old and wrong converge faster than most systems acknowledge.
 
-[View the live signal log →](https://www.refinex.io/transparency)
+[Signal engine reference →](https://www.refinex.io/transparency)
 
 ---
 *Keith Brown*

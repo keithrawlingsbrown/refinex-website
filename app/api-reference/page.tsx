@@ -115,8 +115,13 @@ export default function APIReferencePage() {
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             API Reference
           </h1>
-          <p className="text-xl text-refinex-gray-100 opacity-80 mb-6">
+          <p className="text-xl text-refinex-gray-100 opacity-80 mb-3">
             Complete endpoint documentation for the RefineX signals API.
+          </p>
+          <p className="text-sm mb-6" style={{ color: '#94A3B8' }}>
+            RefineX is not currently offered publicly, at any tier. This page documents endpoint
+            shapes and example payloads for reference — it does not indicate current availability,
+            and the rate limits and tier names below are not currently obtainable.
           </p>
           <div className="flex flex-wrap gap-4">
             <div className="px-4 py-2 rounded-lg bg-refinex-navy-light border border-refinex-cyan/20">
