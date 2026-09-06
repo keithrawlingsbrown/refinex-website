@@ -23,7 +23,7 @@ refinex now
 # └─────────────────────────────────────┘`
 
 const restCode = `curl https://refinex-api.onrender.com/v1/signals/now
-# No API key required`
+# Public access is temporarily unavailable`
 
 type Tab = 'cli' | 'mcp' | 'rest'
 
@@ -49,9 +49,13 @@ export default function DeveloperToolsSection() {
           <h2 className="text-3xl md:text-4xl font-bold text-refinex-primary mb-4">
             Three ways to consume
           </h2>
-          <p className="text-lg text-refinex-secondary">
-            Terminal, Claude Code, or raw HTTP. Same live AWS data. Same deterministic confidence scoring.
+          <p className="text-lg text-refinex-secondary mb-3">
+            Terminal, Claude Code, or raw HTTP — once public access reopens.
           </p>
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold"
+            style={{ background: 'rgba(148,163,184,0.12)', border: '1px solid rgba(148,163,184,0.3)', color: '#94A3B8' }}>
+            Public data access is temporarily unavailable
+          </span>
         </div>
 
         {/* Cards */}
@@ -70,7 +74,7 @@ export default function DeveloperToolsSection() {
             <p className="text-sm text-refinex-secondary flex-1">
               6 commands. Rich output. <code className="text-refinex-cyan">--json</code> flag for piping.
               <br /><br />
-              <code className="text-refinex-cyan">refinex now</code> — zero credentials, live data.
+              Public data access is temporarily unavailable — the package is published, but live signal commands will not return data right now.
             </p>
             <div className="rounded-lg px-3 py-2 font-mono text-xs text-refinex-cyan"
               style={{ background: 'rgba(6,182,212,0.08)', border: '1px solid rgba(6,182,212,0.2)' }}>
@@ -93,9 +97,9 @@ export default function DeveloperToolsSection() {
               </div>
             </div>
             <p className="text-sm text-refinex-secondary flex-1">
-              6 MCP tools. Ask Claude for live spot data inside your editor — no browser, no dashboard.
+              6 MCP tools for asking Claude about spot data inside your editor.
               <br /><br />
-              <code className="text-refinex-cyan">get_live_signal</code> needs no API key.
+              Public data access is temporarily unavailable — the package is published, but tool calls will not return data right now.
             </p>
             <div className="rounded-lg px-3 py-2 font-mono text-xs text-refinex-cyan"
               style={{ background: 'rgba(6,182,212,0.08)', border: '1px solid rgba(6,182,212,0.2)' }}>
@@ -118,10 +122,9 @@ export default function DeveloperToolsSection() {
               </div>
             </div>
             <p className="text-sm text-refinex-secondary flex-1">
-              One endpoint. No auth required for live signal.
-              Wire directly into autoscalers, CI/CD, or Terraform.
+              One endpoint, built for autoscalers, CI/CD, and Terraform.
               <br /><br />
-              JSON response, deterministic confidence score.
+              Public access is temporarily unavailable while we finalize our access model.
             </p>
             <div className="rounded-lg px-3 py-2 font-mono text-xs text-refinex-cyan"
               style={{ background: 'rgba(6,182,212,0.08)', border: '1px solid rgba(6,182,212,0.2)' }}>
@@ -134,7 +137,10 @@ export default function DeveloperToolsSection() {
           </div>
         </div>
 
-        {/* Code preview — CLI example */}
+        {/* Code preview — illustrative example, not live right now */}
+        <p className="text-xs text-refinex-muted text-center mb-3">
+          Illustrative example output — public data access is temporarily unavailable.
+        </p>
         <div className="rounded-xl overflow-hidden"
           style={{ background: '#0F172A', border: '1px solid rgba(255,255,255,0.08)' }}>
           <div className="flex items-center gap-2 px-4 py-3"

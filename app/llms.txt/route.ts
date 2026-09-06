@@ -12,7 +12,7 @@ RefineX monitors AWS EC2 Spot instance pricing across regions in real time, scor
 - Every score is deterministic — no LLM calls in the scoring path
 - Every suppression has a reason — auditable, append-only log
 - Advisory-only by design — proposes, never executes autonomously
-- Pre-revenue, early access: free for 90 days at refinex.io/pricing
+- Not currently offered publicly, at any tier — see refinex.io/pricing for updates
 
 ## What RefineX is not
 
@@ -33,55 +33,34 @@ RefineX monitors AWS EC2 Spot instance pricing across regions in real time, scor
 
 **Audit trail**: Append-only. No UPDATE or DELETE on signal or suppression records. The log is permanent.
 
-## Developer Tools (pip install, no build step)
+## Developer Tools (packages published, public access currently suspended)
 
-CLI — live spot signals in your terminal:
+CLI — refinex-cli is published on PyPI, but public data access is currently
+suspended (no-auth commands will not return data right now):
   pip install refinex-cli
-  refinex now          # best signal right now, no API key required
-  refinex log          # suppression log, no API key required
-  refinex watch        # poll loop, prints on signal change
-  refinex signals      # filtered list, requires API key
   GitHub: https://github.com/keithrawlingsbrown/refinex-cli
   PyPI: https://pypi.org/project/refinex-cli/
 
-MCP server — use RefineX inside Claude Code and Cursor:
+MCP server — refinex-mcp is published on PyPI, same status:
   pip install refinex-mcp
-  Tools (no auth): get_live_signal, get_suppression_log, get_health
-  Tools (API key): list_signals, get_signal_for_instance, get_signals_summary
-  Claude Code: add to ~/.claude/settings.json mcpServers.refinex
   GitHub: https://github.com/keithrawlingsbrown/refinex-mcp
   PyPI: https://pypi.org/project/refinex-mcp/
 
-## Public API (no key required)
+## Public API
 
-Live signal endpoint:
-  GET https://refinex-api.onrender.com/v1/signals/now
+RefineX is not currently offered publicly, at any tier. No endpoint —
+including previously no-auth ones — currently returns live signal data.
+Requests to the API return HTTP 503 with a "not currently available"
+message.
 
-Example response:
-  {
-    "action": "buy_spot",
-    "cloud": "aws",
-    "region": "us-east-1",
-    "availability_zone": "us-east-1f",
-    "instance_type": "m6i.xlarge",
-    "spot_price_usd": 0.0879,
-    "on_demand_price_usd": 0.192,
-    "discount_pct": 54.22,
-    "confidence": 0.71,
-    "ttl_minutes": 55,
-    "suppressed_last_6h": 139,
-    "signal_id": "...",
-    "refreshed_at": "2026-03-26T23:07:28Z"
-  }
+## Surfaces
 
-## Live Surfaces
-
-- https://www.refinex.io/live — real-time signal demo, no auth, 30s revalidate
-- https://www.refinex.io/transparency — public suppression log, 60s revalidate
+- https://www.refinex.io/live — currently unavailable
+- https://www.refinex.io/transparency — public suppression log (may be affected by the current suspension)
 - https://www.refinex.io/blog — technical blog (spot signal deduplication, autoscaler API design)
 - https://www.refinex.io/api-reference — full API reference
 - https://www.refinex.io/docs — integration guides
-- https://www.refinex.io/pricing — Early Access pricing
+- https://www.refinex.io/pricing — not currently available; check for updates
 
 ## Target Audience
 
@@ -99,7 +78,7 @@ suppressed, confidence band, regime, audit trail, advisory-only, deterministic, 
 - Website: https://www.refinex.io
 - API: https://refinex-api.onrender.com
 - Twitter/X: https://x.com/getrefinex
-- Founded: 2026 | Phase: pre-revenue early access
+- Founded: 2026 | Phase: pre-revenue, not currently offered publicly
 `;
 
 export async function GET() {

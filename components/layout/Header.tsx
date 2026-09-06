@@ -124,13 +124,12 @@ export default function Header() {
                   onMouseLeave={e => (e.currentTarget.style.color = '#94A3B8')}>
                   Log In
                 </a>
-                <a href="/auth/login?screen_hint=signup"
-                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all"
-                  style={{ background: '#2563EB' }}
-                  onMouseEnter={e => (e.currentTarget.style.background = '#1D4ED8')}
-                  onMouseLeave={e => (e.currentTarget.style.background = '#2563EB')}>
-                  Get API Key
-                </a>
+                <span
+                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold cursor-default"
+                  style={{ background: 'rgba(255,255,255,0.06)', color: '#475569' }}
+                  title="Not currently available">
+                  Not available yet
+                </span>
               </>
             )}
           </div>
@@ -196,12 +195,12 @@ export default function Header() {
                       style={{ background: 'rgba(255,255,255,0.06)', color: '#94A3B8' }}>
                       Log In
                     </a>
-                    <a href="/auth/login?screen_hint=signup"
-                      onClick={() => setIsOpen(false)}
-                      className="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-semibold text-white"
-                      style={{ background: '#2563EB' }}>
-                      Get API Key
-                    </a>
+                    <span
+                      className="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-semibold cursor-default"
+                      style={{ background: 'rgba(255,255,255,0.06)', color: '#475569' }}
+                      title="Not currently available">
+                      Not available yet
+                    </span>
                   </>
                 )}
               </div>

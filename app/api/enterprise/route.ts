@@ -90,9 +90,9 @@ export async function POST(request: NextRequest) {
 
     // Success response
     return NextResponse.json(
-      { 
+      {
         success: true,
-        message: 'Thank you! We\'ll be in touch within 24 hours.',
+        message: 'Thanks for your interest. RefineX is not currently offered publicly, and we do not have a follow-up process in place yet.',
       },
       { 
         status: 201,

@@ -15,8 +15,9 @@ export default function EnterprisePage() {
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Enterprise</h1>
           <p className="text-xl text-refinex-gray-100 opacity-80 max-w-2xl mx-auto">
-            RefineX works best for teams spending at scale. Tell us about your infrastructure 
-            and we&apos;ll reach out.
+            RefineX is not currently offered publicly, at any tier. You&apos;re welcome to tell
+            us about your infrastructure below, but we don&apos;t have a follow-up process in
+            place yet — please don&apos;t expect a response at this time.
           </p>
         </div>
 
@@ -24,18 +25,6 @@ export default function EnterprisePage() {
         <Card className="max-w-2xl mx-auto">
           <EnterpriseForm />
         </Card>
-
-        {/* Trust Indicators */}
-        <div className="mt-12 text-center">
-          <p className="text-sm text-refinex-gray-100 opacity-60 mb-4">
-            Trusted by infrastructure teams at scale
-          </p>
-          <div className="flex flex-wrap justify-center gap-6 text-refinex-gray-100 opacity-40">
-            <span>• 24-hour response time</span>
-            <span>• No cloud credentials required</span>
-            <span>• SOC 2 Type II (in progress)</span>
-          </div>
-        </div>
       </div>
     </div>
   )

@@ -49,9 +49,11 @@ export default function EnterpriseForm() {
     return (
       <div className="text-center py-12">
         <CheckCircle className="w-16 h-16 text-semantic-success mx-auto mb-4" />
-        <h3 className="text-2xl font-bold mb-2">Thank you!</h3>
+        <h3 className="text-2xl font-bold mb-2">Thanks for your interest.</h3>
         <p className="text-refinex-gray-100 opacity-80">
-          We&apos;ll review your request and reach out within 24 hours.
+          RefineX is not currently offered publicly. We don&apos;t have a follow-up process
+          in place yet, so please don&apos;t expect a response at this time — check
+          refinex.io for updates.
         </p>
       </div>
     )

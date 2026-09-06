@@ -59,11 +59,8 @@ export default function QuickstartPage() {
             <h2 className="text-2xl font-bold">Get your API key</h2>
           </div>
           <p className="text-refinex-gray-100 opacity-80 mb-4">
-            Request an API key through our enterprise form. You&apos;ll receive your key within 24 hours.
+            RefineX is not currently offered publicly, at any tier. API keys are not being issued right now.
           </p>
-          <Link href="/enterprise">
-            <Button variant="outline">Request API Key</Button>
-          </Link>
           <div className="mt-6">
             <CodeBlock code={step1Code} language="bash" />
           </div>
