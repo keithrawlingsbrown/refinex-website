@@ -10,7 +10,7 @@ Pushed: origin/master
 - Connected to refinex-mvp backend (port 8000)
 - Signal Transparency page: live backend data, revalidates 60s
 - Hero signal card: live data with SAMPLE fallback
-- System status pill: polls /api/health every 60s
+- (Removed 2026-09-27) The header's system status pill and /api/health proxy -- it made public page views trigger the backend's alert checks using an admin-level token. The website holds no admin credential; alert checks run on a private QStash schedule in refinex-mvp.
 - Mobile nav: working hamburger menu
 - OG metadata: set for social sharing
 - Privacy + Terms pages: exist with advisory-only language

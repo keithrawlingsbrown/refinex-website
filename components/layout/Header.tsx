@@ -15,28 +15,8 @@ const navigation = [
 
 export default function Header() {
   const pathname = usePathname()
-  const [status, setStatus] = useState<'ok' | 'degraded' | 'loading'>('loading')
   const [isOpen, setIsOpen] = useState(false)
   const [user, setUser] = useState<{ name?: string; email?: string } | null>(null)
-
-  useEffect(() => {
-    async function checkHealth() {
-      try {
-        const res = await fetch('/api/health')
-        if (res.ok) {
-          const data = await res.json()
-          setStatus(data.ok ? 'ok' : 'degraded')
-        } else {
-          setStatus('degraded')
-        }
-      } catch {
-        setStatus('degraded')
-      }
-    }
-    checkHealth()
-    const interval = setInterval(checkHealth, 60_000)
-    return () => clearInterval(interval)
-  }, [])
 
   useEffect(() => {
     async function checkAuth() {
@@ -57,8 +37,6 @@ export default function Header() {
   useEffect(() => {
     setIsOpen(false)
   }, [pathname])
-
-  const statusColor = status === 'ok' ? '#10B981' : status === 'degraded' ? '#F59E0B' : '#475569'
 
   return (
     <header className="sticky top-0 z-50"
@@ -89,15 +67,8 @@ export default function Header() {
             ))}
           </div>
 
-          {/* Desktop: status + CTA */}
+          {/* Desktop: CTA */}
           <div className="hidden md:flex items-center gap-4">
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded-full text-xs"
-              style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
-              <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: statusColor }} />
-              <span style={{ color: '#475569' }}>
-                {status === 'ok' ? 'All systems operational' : status === 'degraded' ? 'Degraded' : '...'}
-              </span>
-            </div>
             {user ? (
               <>
                 <a href="/dashboard"
@@ -203,14 +174,6 @@ export default function Header() {
                     </span>
                   </>
                 )}
-              </div>
-              <div className="px-4 pt-3">
-                <div className="flex items-center gap-1.5 text-xs">
-                  <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: statusColor }} />
-                  <span style={{ color: '#475569' }}>
-                    {status === 'ok' ? 'All systems operational' : status === 'degraded' ? 'Degraded' : '...'}
-                  </span>
-                </div>
               </div>
             </div>
           </div>

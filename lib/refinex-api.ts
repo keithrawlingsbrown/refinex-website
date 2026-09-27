@@ -2,7 +2,6 @@ import { cache } from 'react';
 
 const API_URL = process.env.REFINEX_API_URL || 'https://refinex-api.onrender.com';
 const API_KEY = process.env.REFINEX_API_KEY || '';
-const ADMIN_TOKEN = process.env.REFINEX_ADMIN_TOKEN || '';
 
 export async function getActiveSignal(): Promise<any> {
   try {
@@ -125,24 +124,3 @@ export async function getRegionalSuppression(days: number = 30): Promise<any> {
   } catch { return null; }
 }
 
-export async function getSystemHealth(): Promise<any> {
-  try {
-    const res = await fetch(
-      `${API_URL}/v1/trinity/health`,
-      { headers: { 'X-Admin-Token': ADMIN_TOKEN }, next: { revalidate: 60 } }
-    );
-    if (!res.ok) return null;
-    return await res.json();
-  } catch { return null; }
-}
-
-export async function getDashboardSnapshot(): Promise<any> {
-  try {
-    const res = await fetch(
-      `${API_URL}/v1/trinity/dashboard`,
-      { headers: { 'X-Admin-Token': ADMIN_TOKEN }, next: { revalidate: 60 } }
-    );
-    if (!res.ok) return null;
-    return await res.json();
-  } catch { return null; }
-}
